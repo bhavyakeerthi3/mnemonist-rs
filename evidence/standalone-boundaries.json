@@ -1,0 +1,36 @@
+{
+  "artifact": "target/release/mnemonist",
+  "build": "cargo build --release --no-default-features --bin mnemonist",
+  "source_runtime_linked": false,
+  "napi_dependency_in_normal_tree": false,
+  "unsafe_blocks": 0,
+  "upstream_test_route": {
+    "active_module_files": 41,
+    "passing_assertions": 499,
+    "preserved_upstream_pending": 1,
+    "original_manifest": "A937FEAA87B49B97426BA6C6D8FEE9718E802262AE14B26335210CE68325D381"
+  },
+  "rust_owned_protocol_state": [
+    "core linear and bounded collections",
+    "LRU ordering, eviction, deletion, and opaque identity values",
+    "default/fuzzy map membership and insertion order",
+    "numeric KDTree queries",
+    "string Levenshtein BKTree, PassjoinIndex, and VPTree modes",
+    "SymSpell indexing and unrestricted Damerau-Levenshtein search",
+    "custom-comparator Heap and FibonacciHeap state through comparator-result tables"
+  ],
+  "host_boundaries": [
+    "arbitrary JavaScript callback execution supplies factory, hash, distance, tokenizer, or comparator results",
+    "DefaultWeakMap key collection is reported by host WeakRef/FinalizationRegistry lifecycle notifications; finalizer scheduling remains host-GC dependent",
+    "arbitrary token sequences and exact writable typed-array layouts retain compatibility shims"
+  ],
+  "evidence": {
+    "standalone_symspell_fuzz": "fuzz/log.txt",
+    "standalone_collection_fuzz": "fuzz/log.txt (Stack, Queue, LRUCache, and BitVector; replay with npm run fuzz:standalone-collections -- --duration-ms=120000 --steps=80 --seed=1592639710)",
+    "persistent_protocol_soak": "evidence/soak.json; replay with npm run soak:standalone -- --requests=100000 (one Rust process, every response checked)",
+    "parallel_instance_soak": "cargo test --release --test concurrency_soak (eight independent Stack/Queue instances; no shared-object concurrency claim)",
+    "rust_properties": "cargo test --release --test fuzz_harness",
+    "benchmark": "bench/results.json",
+    "methodology": "bench/methodology.md"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "generated_at": "2026-08-03T06:43:41.526Z",
+  "command": "npm run soak:standalone -- --requests=100000",
+  "status": "pass",
+  "requests": 100000,
+  "cycles": 24999,
+  "elapsed_ms": 920.9898,
+  "requests_per_second": 108578.83550936179,
+  "transport": "one persistent Rust JSONL process; every response checked",
+  "scope": "sequential protocol semantics over a long-lived process; not a claim of concurrent mutation semantics for one JavaScript object"
+}

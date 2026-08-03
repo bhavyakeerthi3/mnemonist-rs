@@ -1,0 +1,25 @@
+track = "H"
+source_url = "https://github.com/Yomguithereal/mnemonist"
+source_commit = "1f2c752049eb3439f3987310391ae5e123e97dfe"
+target_language = "rust"
+team = "Bhavya Keerthi"
+
+[scope]
+original_loc = 20125
+strategy = "phased"
+phase_1 = ["stack", "queue", "linked_list", "fixed_stack", "fixed_deque", "circular_buffer"]
+phase_2 = ["set_ops", "heap", "bi_map", "multi_set", "sparse_set", "bit_set", "static_disjoint_set"]
+phase_3 = ["lru_cache", "lru_map", "lru_cache_with_delete", "lru_map_with_delete", "vector", "hashed_array_tree", "multi_map", "multi_array", "sparse_map", "sparse_queue_set", "bit_vector", "fixed_reverse_heap"]
+phase_4 = ["bk_tree", "bloom_filter", "critbit_tree_map", "fixed_critbit_tree_map", "default_map", "default_weak_map", "fibonacci_heap", "fuzzy_map", "fuzzy_multi_map", "inverted_index", "kd_tree", "passjoin_index", "semi_dynamic_trie", "sort", "static_interval_tree", "suffix_array", "symspell", "trie", "trie_map", "vp_tree"]
+
+[tests]
+original_path = "tests/original"
+original_file_count = 42
+active_module_file_count = 41
+last_original_suite = "499 passing assertions, 0 failures"
+last_manifest_hash = "A937FEAA87B49B97426BA6C6D8FEE9718E802262AE14B26335210CE68325D381"
+hash_at_kickoff = "A937FEAA87B49B97426BA6C6D8FEE9718E802262AE14B26335210CE68325D381"
+
+[unsafe]
+count = 0
+target = 0

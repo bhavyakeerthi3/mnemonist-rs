@@ -1,0 +1,202 @@
+# Differential fuzz log - Port Mortem
+# Run: cargo test --test fuzz_harness
+# Target: 60s+ continuous run with zero divergences for the optional bonus
+
+2026-08-02T23:19:15+05:30 smoke/property verification
+  command: cargo test --release --test fuzz_harness
+  stack_differential_smoke ........ PASS
+  queue_differential_smoke ........ PASS
+  stack_queue_independent_traces .. PASS
+  result: 3 passed, 0 failed
+
+Status: smoke/property harness passing on the current native-build host.
+
+2026-08-02T23:18:00+05:30 Node-reference differential verification
+  command: node scripts/differential-fuzz.js --duration-ms=30000 --seed=1592639710
+  reference: original/mnemonist/stack.js and original/mnemonist/queue.js
+  subject: compiled N-API Stack and Queue adapters
+  compared after every operation: return value, size, toArray, values, entries
+  stack operations ................ 8,605,388 PASS
+  queue operations ................ 8,454,975 PASS
+  total synchronized operations ... 17,060,363 PASS
+
+The campaign caught and led to a fix for a real boundary bug: a stored JS
+`null` was incorrectly normalized to `undefined` by Stack/Queue empty-result
+handling. The remaining limitation is scope: this is strong differential
+evidence for two Rust-backed structures, not a claim of broad all-module fuzz
+coverage or the optional survivor bonus.
+
+2026-08-02T23:29:00+05:30 expanded Node-reference differential verification
+  command: npm run fuzz:differential
+  duration: 20 seconds per structure (60 seconds total), seed 0x5eedc0de
+  stack operations ................ 6,675,435 PASS
+  queue operations ................ 6,630,875 PASS
+  linked-list operations .......... 4,200,534 PASS
+  total synchronized operations ... 17,506,844 PASS
+
+The LinkedList probe also found a latent upstream defect: after shifting the
+last node, its `last()` method can return a stale removed tail although the list
+is empty. The Rust port returns the documented empty value (`undefined`), so
+the differential probe checks `last()` whenever the list is non-empty and logs
+the upstream-only empty-tail state as an innovation finding rather than making
+the port less correct.
+
+2026-08-02T23:40:00+05:30 expanded Node-reference differential verification
+  command: npm run fuzz:differential
+  duration: 15 seconds per structure (60 seconds total), seed 0x5eedc0de
+  stack operations ................ 5,047,974 PASS
+  queue operations ................ 5,086,174 PASS
+  linked-list operations .......... 3,226,291 PASS
+  fixed-stack operations .......... 5,064,357 PASS
+  total synchronized operations ... 18,424,796 PASS
+
+The FixedStack extension exercised bounded capacity behavior in addition to
+empty results, iteration order, and stored `null` values. The port originally
+erased a stored `null` on `pop`/`peek`; the bridge now checks size before
+normalizing an empty result, matching upstream while keeping Rust's `Option`
+API idiomatic.
+
+2026-08-02T23:49:00+05:30 ring-structure Node-reference differential verification
+  command: npm run fuzz:differential
+  duration: 15 seconds per structure (75 seconds total), seed 0x5eedc0de
+  stack operations ................ 4,937,345 PASS
+  queue operations ................ 4,018,702 PASS
+  linked-list operations .......... 2,757,679 PASS
+  fixed-stack operations .......... 4,247,742 PASS
+  fixed-deque operations .......... 3,146,104 PASS
+  total synchronized operations ... 19,107,572 PASS
+
+FixedDeque shares the ring adapter with CircularBuffer. The campaign covers
+front and back insertion, removal, bounded-capacity state, iteration, and both peeks.
+It caught the same stored-`null` ambiguity in the shared adapter; empty results
+are now decided from the native size before returning the native value.
+
+2026-08-03T00:20:00+05:30 expanded Node-reference differential verification
+  command: npm run fuzz:differential
+  duration: 15 seconds per structure (105 seconds total), seed 0x5eedc0de
+  stack operations ................ 2,173,166 PASS
+  queue operations ................ 1,317,343 PASS
+  linked-list operations ..........   913,807 PASS
+  fixed-stack operations .......... 1,333,686 PASS
+  fixed-deque operations ..........   917,397 PASS
+  bit-vector operations ...........    93,907 PASS
+  lru-cache operations ............   441,596 PASS
+  total synchronized operations ... 7,190,902 PASS
+
+BitVector compares upstream-consistent state and iterator behavior after every
+operation, while retaining Rust's independently checked size invariant. See
+`UPSTREAM_FINDINGS.md` for four preserved-upstream invalid states excluded from
+strict comparison. LRUCache covers Rust-backed promotion, replacement, eviction,
+iteration order, clear, `setpop`, and stored `null` values.
+
+2026-08-03T00:33:00+05:30 expanded Node-reference differential verification
+  command: npm run fuzz:differential
+  duration: 15 seconds per structure (120 seconds total), seed 0x5eedc0de
+  stack operations ................ 4,912,427 PASS
+  queue operations ................ 4,809,167 PASS
+  linked-list operations .......... 3,099,970 PASS
+  fixed-stack operations .......... 4,954,844 PASS
+  fixed-deque operations .......... 3,076,340 PASS
+  bit-vector operations ...........   218,895 PASS
+  lru-cache operations ............ 1,340,818 PASS
+  lru-cache-with-delete operations  1,103,059 PASS
+  total synchronized operations ... 23,515,520 PASS
+
+LRUCacheWithDelete validates the native ordering core and JS-value sidecar for
+set, setpop, get, peek, clear, has, values, keys, and entries. The documented
+upstream delete/remove-after-setpop traversal corruption is excluded from strict
+comparison rather than reproduced in the Rust-backed bridge.
+
+2026-08-03T01:05:00+05:30 native Vector Node-reference differential verification
+  command: npm run fuzz:differential
+  duration: 15 seconds per structure (135 seconds total), seed 0x5eedc0de
+  stack operations ................ 4,472,781 PASS
+  queue operations ................ 4,164,364 PASS
+  linked-list operations .......... 3,017,545 PASS
+  fixed-stack operations .......... 4,480,213 PASS
+  fixed-deque operations .......... 3,005,262 PASS
+  bit-vector operations ...........   195,868 PASS
+  lru-cache operations ............   491,072 PASS
+  lru-cache-with-delete operations    635,879 PASS
+  typed-vector operations .........   774,813 PASS
+  total synchronized operations ... 21,237,797 PASS
+
+Typed Vector compares push, set, pop, resize, reallocate, grow, capacity,
+logical length, values, entries, and the public typed backing view. The subject
+uses Rust `VectorInner` storage; arbitrary arrays/custom factories stay on the
+documented JavaScript compatibility path.
+
+2026-08-03 fresh seeded Node-reference differential verification
+  command: npm run fuzz:differential
+  duration: 15 seconds per structure (135 seconds total), seed 0x5eedc0de
+  stack operations ................ 2,194,960 PASS
+  queue operations ................ 2,135,917 PASS
+  linked-list operations .......... 1,346,718 PASS
+  fixed-stack operations .......... 2,106,618 PASS
+  fixed-deque operations .......... 1,405,766 PASS
+  bit-vector operations ...........    92,441 PASS
+  lru-cache operations ............   605,594 PASS
+  lru-cache-with-delete operations    516,941 PASS
+  typed-vector operations .........   393,605 PASS
+  total synchronized operations ... 10,798,560 PASS
+
+This reproducible campaign compares return values and observable state after
+each operation against preserved upstream JavaScript in the documented
+upstream-consistent domains. The seed, duration, operation totals, and known
+upstream-invalid states are retained here and in `UPSTREAM_FINDINGS.md`.
+
+2026-08-03T09:47:27+05:30 standalone SymSpell differential verification
+  command: npm run fuzz:standalone-symspell -- --duration-ms=120000 --steps=800 --seed=1592639710
+  reference: original/mnemonist/symspell.js
+  subject: target/release/mnemonist through the JSONL protocol (no N-API)
+  maxDistance=1 verbosity=0 ........ 800 synchronized operations PASS
+  maxDistance=2 verbosity=1 ........ 800 synchronized operations PASS
+  maxDistance=2 verbosity=2 ........ 800 synchronized operations PASS
+  maxDistance=4 verbosity=2 ........ 800 synchronized operations PASS
+  total synchronized operations .... 3,200 PASS
+
+The first deterministic trace caught an implementation defect: Rust used
+optimal-string-alignment distance, whereas Mnemonist's SymSpell source uses
+unrestricted Damerau-Levenshtein. The reduced `bem` / `mb` trace is now a Rust
+regression test. The passing campaign compares duplicate counts, ordered
+suggestions, add/search/clear behavior, maximum distance, and verbosity modes.
+
+2026-08-03 standalone collection differential verification
+  command: npm run fuzz:standalone-collections -- --steps=80 --duration-ms=120000 --seed=1592639710
+  reference: original/mnemonist stack.js, queue.js, and lru-cache.js
+  subject: target/release/mnemonist through the JSONL protocol (no N-API)
+  stack operations ................. 80 PASS
+  queue operations ................. 80 PASS
+  lru-cache operations ............. 80 PASS
+  total synchronized operations .... 240 PASS
+
+Each operation compares its return value, size, and observable order against
+the original before the next operation proceeds. Divergence reports retain the
+seed and the most recent operation trace for replay.
+
+2026-08-03 standalone collection differential verification (expanded)
+  command: npm run fuzz:standalone-collections -- --steps=80 --duration-ms=120000 --seed=1592639710
+  reference: original/mnemonist stack.js, queue.js, lru-cache.js, and bit-vector.js
+  subject: target/release/mnemonist through the JSONL protocol (no N-API)
+  stack operations ................. 80 PASS
+  queue operations ................. 80 PASS
+  lru-cache operations ............. 80 PASS
+  bit-vector operations ............ 80 PASS
+  total synchronized operations .... 320 PASS
+
+The BitVector trace varies push, set, reset, flip, and rank inside the source
+module's documented bit domain, then compares length, population count, and
+the full observable bit sequence after every step.
+
+2026-08-03 persistent standalone protocol soak
+  command: npm run soak:standalone -- --requests=100000
+  subject: one target/release/mnemonist process (no N-API)
+  requests ........................ 100,000 PASS
+  elapsed .......................... 920.9898 ms
+  throughput ....................... 108,578.84 checked requests/sec
+
+The trace alternates Stack push/pop and Queue enqueue/dequeue for 24,999
+cycles, verifies every protocol response, and asserts that both final states
+are empty. The JSON record is retained in evidence/soak.json. This exercises
+long-lived sequential protocol state; the separate Rust test suite exercises
+independent containers under parallel thread load.

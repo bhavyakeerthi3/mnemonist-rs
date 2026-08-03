@@ -1,0 +1,40 @@
+name: Verify Port
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  standalone:
+    name: Rust-only submission evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - run: npm ci
+      - run: cargo test --release
+      - run: npm run verify:submission
+      - run: npm run fuzz:standalone-symspell -- --duration-ms=120000 --steps=800 --seed=1592639710
+      - run: npm run fuzz:standalone-collections -- --duration-ms=120000 --steps=80 --seed=1592639710
+      - run: npm run soak:standalone -- --requests=100000
+      - run: npm run bench:rust-rss
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: port-evidence
+          path: |
+            bench/results.json
+            evidence/
+            fuzz/log.txt
+          if-no-files-found: warn
