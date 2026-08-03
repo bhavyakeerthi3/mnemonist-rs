@@ -1,0 +1,13 @@
+.git
+.github
+target
+node_modules
+mnemonist.node
+original
+tests
+adapter
+bench
+benches
+evidence
+fuzz
+*.log

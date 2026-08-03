@@ -1,0 +1,6 @@
+/target
+/node_modules
+/mnemonist.node
+/coverage
+npm-debug.log*
+.DS_Store
