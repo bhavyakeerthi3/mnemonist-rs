@@ -75,7 +75,9 @@ const elements = {
   trace: document.querySelector('#protocol-trace'),
   status: document.querySelector('#runtime-status'),
   statusBox: document.querySelector('.runtime-status'),
-  engine: document.querySelector('#engine-value')
+  engine: document.querySelector('#engine-value'),
+  launchGate: document.querySelector('#launch-gate'),
+  enterArcade: document.querySelector('#enter-arcade')
 };
 
 let active = 'stack';
@@ -279,6 +281,11 @@ document.querySelector('#sample-button').addEventListener('click', () => {
   if (active === 'lru') elements.secondary.value = '"checkpoint"';
 });
 document.querySelector('#clear-trace').addEventListener('click', () => { elements.trace.textContent = ''; });
+elements.enterArcade.addEventListener('click', () => {
+  elements.launchGate.classList.add('is-hidden');
+  elements.launchGate.setAttribute('aria-hidden', 'true');
+  elements.search.focus();
+});
 
 renderSelector();
 boot();
