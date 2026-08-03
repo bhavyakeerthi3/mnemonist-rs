@@ -7,17 +7,21 @@ the N-API addon or a JavaScript implementation of the collections.
 ## Play Online
 
 [Open Mnemo Arcade on Vercel](https://mnemo-arcade-rust.vercel.app). It exposes
-the same five playable modules as the local server: Stack, Queue, LRU Cache,
-Bit Vector, and SymSpell.
+all 41 standalone Rust protocol modules, grouped into Classics, Low Level,
+Search & NLP, Indexation, Probabilistic, and Utility collections. Structures
+with a static construction phase expose their initialized Rust state and a
+reload control; mutable structures expose their supported protocol actions.
 
 ## How To Play
 
 1. Choose a module from the left-hand selector.
 2. Enter a value. Inputs accept JSON, so use `42`, `true`, `{"level": 3}`, or
    a quoted string such as `"checkpoint"`.
-3. For LRU Cache, provide both a key and a value, then press `SET`.
-4. Use the action buttons to mutate or inspect the collection.
-5. Read the Rust State Buffer and Protocol Trace after every action. The reset
+3. Use the module filter to jump directly to a collection, such as `Bloom`,
+   `Suffix`, or `CritBit`.
+4. For keyed modules, provide both a key and a value, then press `SET`.
+5. Use the action buttons to mutate or inspect the collection.
+6. Read the Rust State Buffer and Protocol Trace after every action. The reset
    icon starts a fresh collection of the selected kind.
 
 ## Run Locally

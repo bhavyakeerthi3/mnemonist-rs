@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#070725">
+  <meta name="theme-color" content="#282a36">
   <title>Mnemo Arcade | Rust Protocol Playground</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
@@ -31,12 +31,12 @@
 
     <section class="arcade-layout">
       <nav class="collection-deck" aria-label="Collection selector">
-        <p class="panel-kicker">SELECT MODULE</p>
-        <button class="collection-button is-active" data-collection="stack"><span>01</span> STACK</button>
-        <button class="collection-button" data-collection="queue"><span>02</span> QUEUE</button>
-        <button class="collection-button" data-collection="lru"><span>03</span> LRU CACHE</button>
-        <button class="collection-button" data-collection="bit-vector"><span>04</span> BIT VECTOR</button>
-        <button class="collection-button" data-collection="symspell"><span>05</span> SYMSPELL</button>
+        <div class="selector-header">
+          <p class="panel-kicker">SELECT MODULE</p>
+          <strong id="module-count">41 RUST MODULES</strong>
+        </div>
+        <input id="module-search" type="search" autocomplete="off" placeholder="Filter modules">
+        <div id="collection-list" class="collection-list"></div>
         <div class="deck-footer">LIVE RUST STATE<br>NO N-API</div>
       </nav>
 
