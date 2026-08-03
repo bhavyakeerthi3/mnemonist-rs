@@ -26,9 +26,8 @@
 Run `npm run verify:submission` from a fresh checkout to verify the test
 manifest, Rust-only executable boundary, zero-unsafe audit, protocol contract,
 and unchanged upstream test path. See [SUBMISSION.md](SUBMISSION.md) for the
-evidence index, [DECISIONS.md](DECISIONS.md) for explicit semantic boundaries,
-[PLAYGROUND.md](PLAYGROUND.md) for local or Docker demo instructions, and
-[DEMO_SCRIPT.md](DEMO_SCRIPT.md) for the five-minute submission walkthrough.
+submission evidence, [DECISIONS.md](DECISIONS.md) for explicit semantic boundaries,
+[PLAYGROUND.md](PLAYGROUND.md) for local or Docker demo instructions.
 
 This repository ports the root JavaScript structure files from [Yomguithereal/mnemonist](https://github.com/Yomguithereal/mnemonist) to Rust. Every upstream root `.js` structure file has a Rust counterpart in `src/`, excluding package entrypoints like `index.js`.
 
@@ -193,7 +192,7 @@ toolchain when available (or the configured Rust toolchain otherwise).
 - `bench/results.json`: benchmark smoke results
 - `fuzz/log.txt`: fuzz/property smoke log
 - `DEMO.md`: reproducible five-minute recording flow using submission commands
-- `SUBMISSION.md`: judge-facing artifact, verification, fuzz, benchmark, and boundary scorecard
+- `SUBMISSION.md`: judge-facing artifact, verification, fuzz, benchmark, and boundary evidence
 - `evidence/standalone-boundaries.json`: machine-readable statement of Rust ownership and host boundaries
 - `UPSTREAM_FINDINGS.md`: independently reproducible upstream behavioral finding
 - `DECISIONS.md`: architecture notes

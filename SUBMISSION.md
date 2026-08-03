@@ -1,8 +1,8 @@
-# Submission Scorecard
+# Submission Evidence
 
-## Judge Evidence Map
+## Evidence Index
 
-| What to assess | Evidence | Reproduce or inspect |
+| Evidence area | Recorded proof | Reproduce or inspect |
 | --- | --- | --- |
 | Runnable Rust artifact | Node-free JSONL executable | `cargo build --release --no-default-features --bin mnemonist` |
 | Test integrity | 42 upstream files match the kickoff manifest | `npm run verify:original-tests` |
@@ -12,8 +12,6 @@
 | Performance honesty | Warmed p50/p95/p99, startup, throughput, and scoped RSS methodology | `bench/results.json`, `bench/methodology.md` |
 | Architecture boundaries | Callback and GC semantics stated explicitly | `DECISIONS.md`, `evidence/standalone-boundaries.json` |
 | Live inspection | 41 Rust protocol modules in the browser playground | [mnemo-arcade-rust.vercel.app](https://mnemo-arcade-rust.vercel.app) |
-
-For a concise recorded walkthrough, follow [DEMO_SCRIPT.md](DEMO_SCRIPT.md).
 
 ## Artifact
 
