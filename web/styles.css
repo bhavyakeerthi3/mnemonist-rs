@@ -199,8 +199,8 @@ pre { max-height: 185px; overflow: auto; margin: 0; padding: 13px; color: var(--
 .evidence-deck h2 { max-width: 100%; margin-bottom: 20px; color: var(--pink); font-size: 18px; line-height: 1.4; overflow-wrap: anywhere; }
 dl { margin: 0; }
 dl div { padding: 12px 0; border-bottom: 1px solid var(--line); }
-dt { color: #d6d8e8; font-size: 10px; font-weight: 600; }
-dd { margin: 6px 0 0; color: var(--mint); font-size: 12px; line-height: 1.4; }
+dt { color: #d6d8e8; font-family: "Press Start 2P", "Courier New", monospace; font-size: 9px; font-weight: 600; line-height: 1.6; }
+dd { margin: 8px 0 0; color: var(--mint); font-size: 17px; line-height: 1.2; }
 .boundary-note { margin-top: 22px; border-left: 4px solid var(--yellow); padding: 10px 0 10px 11px; background: rgba(241, 250, 140, 0.08); }
 .boundary-note span { color: var(--yellow); font-size: 10px; font-weight: 600; }
 .boundary-note p { margin: 7px 0 0; color: #f8f8f2; font-size: 12px; line-height: 1.45; }
