@@ -5,7 +5,12 @@ target_language = "rust"
 team = "Bhavya Keerthi"
 
 [scope]
-original_loc = 20125
+# Mnemonist is an official recommended-pool repository, listed as "Over 8k".
+# The bring-your-own 1k-8k guideline therefore does not apply to this entry.
+# Counts below distinguish the port target from the full upstream checkout.
+source_root_file_count = 45
+source_root_loc = 11207
+upstream_recursive_js_loc = 20125
 strategy = "phased"
 phase_1 = ["stack", "queue", "linked_list", "fixed_stack", "fixed_deque", "circular_buffer"]
 phase_2 = ["set_ops", "heap", "bi_map", "multi_set", "sparse_set", "bit_set", "static_disjoint_set"]

@@ -48,6 +48,13 @@ package-entrypoint glue. This keeps the port centered on the observable
 algorithms that make Mnemonist useful: stateful containers, indexing structures,
 ordering, search, and bounded-memory behavior.
 
+Mnemonist is explicitly listed in the official recommended pool for both the
+JavaScript-to-Rust and Track H routes, where it is marked `Over 8k`. The pool's
+line counts are rough estimates. This port targets the 45 root data-structure
+modules measured at 11,207 JavaScript lines; the 20,125-line recursive upstream
+JavaScript count includes tests and supporting code outside that translation
+scope. The distinction is recorded in `.port-mortem.toml`.
+
 ## Judge Quickstart
 
 ```bash
