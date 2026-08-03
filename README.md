@@ -1,10 +1,33 @@
 # mnemonist-port
 
-Port Mortem Track H: JavaScript to Rust.
+**Port Mortem 2026, Track H: Mnemonist from JavaScript to Rust.**
 
-**Interactive demo:** [play Mnemo Arcade on Vercel](https://mnemo-arcade-rust.vercel.app).
-See [PLAYGROUND.md](PLAYGROUND.md) for the controls and local/Docker launch
-instructions.
+<p align="center">
+  <a href="https://mnemo-arcade-rust.vercel.app"><strong>Play Mnemo Arcade</strong></a>
+  &nbsp;|&nbsp;
+  <a href="#judge-quickstart"><strong>Run the proof</strong></a>
+  &nbsp;|&nbsp;
+  <a href="DECISIONS.md"><strong>Read the decisions</strong></a>
+</p>
+
+![Mnemo Arcade, the Rust protocol playground](docs/mnemo-arcade.png)
+
+## At A Glance
+
+| Evidence | Reproducible result |
+| --- | --- |
+| Preserved upstream tests | 42 kickoff-hashed files, **499 passing**, 1 upstream-owned pending |
+| Rust verification | **224 passing** release tests |
+| Submitted artifact | Rust-only JSONL executable, with no `napi` or `napi-derive` dependency |
+| Safety audit | **0 handwritten `unsafe`** blocks, functions, impls, or extern declarations |
+| Behavioral evidence | Seeded standalone differential fuzzing, a 100k-request persistent-protocol soak, and p50/p95/p99 plus RSS methodology |
+| Live demonstration | [Mnemo Arcade on Vercel](https://mnemo-arcade-rust.vercel.app): 41 Rust protocol modules, executed by Rust serverless functions |
+
+Run `npm run verify:submission` from a fresh checkout to verify the test
+manifest, Rust-only executable boundary, zero-unsafe audit, protocol contract,
+and unchanged upstream test path. See [SUBMISSION.md](SUBMISSION.md) for the
+evidence index, [DECISIONS.md](DECISIONS.md) for explicit semantic boundaries,
+and [PLAYGROUND.md](PLAYGROUND.md) for local or Docker demo instructions.
 
 This repository ports the root JavaScript structure files from [Yomguithereal/mnemonist](https://github.com/Yomguithereal/mnemonist) to Rust. Every upstream root `.js` structure file has a Rust counterpart in `src/`, excluding package entrypoints like `index.js`.
 
