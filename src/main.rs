@@ -23,7 +23,7 @@ const WEB_APP: &str = include_str!("../web/app.js");
 const WEB_BACKGROUND: &[u8] = include_bytes!("../web/arcade-circuit.png");
 
 #[derive(Debug, Deserialize)]
-struct Request {
+pub(crate) struct Request {
     #[serde(default)]
     id: Value,
     op: String,
@@ -33,6 +33,11 @@ struct Request {
     method: Option<String>,
     #[serde(default)]
     args: Vec<Value>,
+}
+
+#[derive(Debug, Deserialize)]
+pub(crate) struct BatchRequest {
+    pub(crate) requests: Vec<Request>,
 }
 
 #[derive(Default)]
@@ -366,6 +371,38 @@ enum Collection {
         tree: CritBitTreeMap,
         capacity: Option<usize>,
     },
+}
+
+#[allow(dead_code)]
+pub(crate) struct ProtocolState {
+    collections: HashMap<String, Collection>,
+}
+
+#[allow(dead_code)]
+impl ProtocolState {
+    pub(crate) fn new() -> Self {
+        Self {
+            collections: HashMap::new(),
+        }
+    }
+
+    pub(crate) fn execute(&mut self, request: Request) -> Value {
+        execute(request, &mut self.collections)
+    }
+}
+
+pub(crate) fn execute_batch(requests: Vec<Request>) -> Value {
+    let mut state = ProtocolState::new();
+    let mut response = failure(
+        Value::Null,
+        "batch requires at least one request".to_owned(),
+    );
+
+    for request in requests {
+        response = state.execute(request);
+    }
+
+    response
 }
 
 impl Collection {
@@ -1924,9 +1961,12 @@ fn handle_http_connection(
             )
         }
         ("POST", "/api/protocol") => {
-            let response = match serde_json::from_slice::<Request>(&body) {
-                Ok(request) => execute(request, collections),
-                Err(error) => failure(Value::Null, format!("invalid request: {error}")),
+            let response = match serde_json::from_slice::<BatchRequest>(&body) {
+                Ok(batch) => execute_batch(batch.requests),
+                Err(_) => match serde_json::from_slice::<Request>(&body) {
+                    Ok(request) => execute(request, collections),
+                    Err(error) => failure(Value::Null, format!("invalid request: {error}")),
+                },
             }
             .to_string();
             write_http_response(
@@ -2080,5 +2120,24 @@ mod tests {
             response["error"],
             json!("collection requests require a string id")
         );
+    }
+
+    #[test]
+    fn batch_replays_state_from_a_fresh_protocol_instance() {
+        let response = execute_batch(vec![
+            request(json!("stack"), "create", Some("stack"), None, vec![]),
+            request(
+                json!("stack"),
+                "call",
+                None,
+                Some("push"),
+                vec![json!("vercel")],
+            ),
+            request(json!("stack"), "snapshot", None, None, vec![]),
+        ]);
+
+        assert_eq!(response["ok"], json!(true));
+        assert_eq!(response["size"], json!(1));
+        assert_eq!(response["result"]["value"]["values"], json!(["vercel"]));
     }
 }

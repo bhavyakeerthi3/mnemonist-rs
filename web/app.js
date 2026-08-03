@@ -53,6 +53,7 @@ const elements = {
 let active = 'stack';
 let session = '';
 let requestNumber = 0;
+let operationHistory = [];
 
 function newSession() {
   session = `arcade-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
@@ -75,7 +76,8 @@ function trace(label, value) {
   elements.trace.textContent = `${entry}\n\n${elements.trace.textContent}`.slice(0, 5000);
 }
 
-async function protocol(payload) {
+async function protocol(requests) {
+  const payload = { requests };
   trace('REQUEST', payload);
   const response = await fetch('/api/protocol', {
     method: 'POST',
@@ -91,13 +93,14 @@ async function protocol(payload) {
 async function reset() {
   const definition = modules[active];
   newSession();
+  operationHistory = [{ id: session, op: 'create', kind: definition.kind, args: definition.args }];
   elements.trace.textContent = '';
-  const response = await protocol({ id: session, op: 'create', kind: definition.kind, args: definition.args });
+  const response = await protocol(operationHistory);
   renderState([], response.size || 0);
 }
 
 async function snapshot() {
-  const response = await protocol({ id: session, op: 'snapshot' });
+  const response = await protocol([...operationHistory, { id: session, op: 'snapshot' }]);
   const rawValues = response.result?.value?.values;
   const values = Array.isArray(rawValues) ? rawValues : rawValues == null ? [] : [rawValues];
   renderState(values, response.size || 0);
@@ -115,7 +118,8 @@ async function action(method) {
   if (method === 'clear') args = [];
 
   try {
-    const response = await protocol({ id: session, op: 'call', method, args });
+    operationHistory.push({ id: session, op: 'call', method, args });
+    const response = await protocol(operationHistory);
     if (method === 'add' && active === 'symspell') {
       renderState([`INDEXED: ${String(primary)}`], response.size || 0);
     } else if (method !== 'search' && method !== 'size') {

@@ -2,5 +2,10 @@
 /node_modules
 /mnemonist.node
 /coverage
+/public
+/.vercel
 npm-debug.log*
 .DS_Store
+
+.vercel
+.env*

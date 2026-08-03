@@ -2,6 +2,10 @@
 
 Port Mortem Track H: JavaScript to Rust.
 
+**Interactive demo:** [play Mnemo Arcade on Vercel](https://mnemo-arcade-rust.vercel.app).
+See [PLAYGROUND.md](PLAYGROUND.md) for the controls and local/Docker launch
+instructions.
+
 This repository ports the root JavaScript structure files from [Yomguithereal/mnemonist](https://github.com/Yomguithereal/mnemonist) to Rust. Every upstream root `.js` structure file has a Rust counterpart in `src/`, excluding package entrypoints like `index.js`.
 
 ## Open Pair Rationale

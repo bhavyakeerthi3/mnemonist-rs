@@ -13,6 +13,19 @@ napi-derive = { version = "2.16.13", optional = true }
 serde = { version = "1.0.210", features = ["derive"] }
 serde_json = "1.0.128"
 
+[target.'cfg(unix)'.dependencies]
+http-body-util = "0.1"
+tokio = { version = "1", features = ["full"] }
+vercel_runtime = "2.4.0"
+
+[[bin]]
+name = "protocol"
+path = "api/protocol.rs"
+
+[[bin]]
+name = "health"
+path = "api/health.rs"
+
 [features]
 default = []
 nodejs = ["napi", "napi-derive"]
