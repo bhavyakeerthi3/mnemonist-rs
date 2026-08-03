@@ -1,14 +1,15 @@
 :root {
   color-scheme: dark;
-  --ink: #f6f8ff;
-  --night: #070725;
-  --panel: #101039;
-  --panel-deep: #0b0b2d;
-  --cyan: #2ee9ff;
-  --pink: #ff3fb8;
-  --yellow: #ffe34e;
-  --mint: #43f7bd;
-  --line: rgba(77, 229, 255, 0.34);
+  --ink: #f8f8f2;
+  --night: #282a36;
+  --panel: #44475a;
+  --panel-deep: #21222c;
+  --cyan: #8be9fd;
+  --pink: #ff79c6;
+  --yellow: #f1fa8c;
+  --mint: #50fa7b;
+  --purple: #bd93f9;
+  --line: rgba(189, 147, 249, 0.48);
 }
 
 * { box-sizing: border-box; }
@@ -18,8 +19,8 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    linear-gradient(135deg, rgba(238, 13, 163, 0.86), rgba(108, 4, 81, 0.92)),
-    #7b075f url('/arcade-circuit.png') center top / cover fixed;
+    linear-gradient(135deg, rgba(40, 42, 54, 0.91), rgba(33, 34, 44, 0.96)),
+    #282a36 url('/arcade-circuit.png') center top / cover fixed;
   font-family: "Segoe UI", Arial, sans-serif;
 }
 
@@ -39,13 +40,13 @@ button { cursor: pointer; }
   gap: 24px;
   padding: 12px 18px 18px;
   border-bottom: 2px solid var(--cyan);
-  background: rgba(7, 7, 37, 0.82);
-  box-shadow: 0 0 0 4px rgba(255, 63, 184, 0.2), 0 0 28px rgba(46, 233, 255, 0.18);
+  background: rgba(33, 34, 44, 0.9);
+  box-shadow: 0 0 0 4px rgba(189, 147, 249, 0.2), 0 0 28px rgba(139, 233, 253, 0.16);
 }
 
 .eyebrow, .panel-kicker {
   margin: 0;
-  color: #fff0ad;
+  color: var(--yellow);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 1px;
@@ -60,13 +61,13 @@ button { cursor: pointer; }
 }
 
 .brand-lockup h1 {
-  color: #fff3fb;
+  color: var(--ink);
   font-size: clamp(31px, 5vw, 64px);
-  text-shadow: 2px 2px 0 #ad1e78, 4px 4px 0 #170b43;
+  text-shadow: 2px 2px 0 #6272a4, 4px 4px 0 #21222c;
 }
 
 .brand-lockup h1 span { color: var(--cyan); }
-.brand-subtitle { margin: 9px 0 0; color: #eef0ff; font-size: 13px; font-weight: 400; }
+.brand-subtitle { margin: 9px 0 0; color: #d6d8e8; font-size: 13px; font-weight: 400; }
 
 .runtime-status {
   display: grid;
@@ -90,19 +91,19 @@ button { cursor: pointer; }
   grid-template-columns: repeat(4, 1fr);
   margin: 18px 0;
   border: 2px solid var(--line);
-  background: rgba(10, 10, 42, 0.92);
+  background: rgba(40, 42, 54, 0.94);
 }
 .score-strip div { min-height: 66px; padding: 12px 16px; border-right: 1px solid var(--line); }
 .score-strip div:last-child { border-right: 0; }
 .score-strip span, .score-strip strong { display: block; }
-.score-strip span { color: #aeb4d5; font-size: 10px; letter-spacing: 1px; }
+.score-strip span { color: #d6d8e8; font-size: 10px; letter-spacing: 1px; }
 .score-strip strong { margin-top: 5px; color: var(--yellow); font-size: 18px; }
 
 .arcade-layout { display: grid; grid-template-columns: 210px minmax(0, 1fr) 250px; gap: 18px; }
 .collection-deck, .play-surface, .evidence-deck {
   border: 2px solid var(--cyan);
-  background: rgba(11, 11, 45, 0.93);
-  box-shadow: 5px 5px 0 rgba(255, 63, 184, 0.54);
+  background: rgba(40, 42, 54, 0.95);
+  box-shadow: 5px 5px 0 rgba(98, 114, 164, 0.72);
 }
 
 .collection-deck { display: flex; flex-direction: column; padding: 16px 12px 12px; }
@@ -116,28 +117,28 @@ button { cursor: pointer; }
   border: 0;
   border-left: 4px solid transparent;
   background: transparent;
-  color: #f0f2ff;
+  color: var(--ink);
   text-align: left;
   font-weight: 600;
 }
 .collection-button span { color: var(--pink); font-size: 11px; }
-.collection-button:hover, .collection-button.is-active { border-left-color: var(--yellow); background: rgba(46, 233, 255, 0.13); color: var(--yellow); }
+.collection-button:hover, .collection-button.is-active { border-left-color: var(--yellow); background: rgba(98, 114, 164, 0.5); color: var(--yellow); }
 .deck-footer { margin-top: auto; padding: 15px 6px 4px; color: var(--mint); font-size: 11px; line-height: 1.6; }
 
 .play-surface { min-width: 0; padding: 20px; }
 .surface-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding-bottom: 15px; border-bottom: 1px solid var(--line); }
-.play-surface h2, .evidence-deck h2 { color: var(--cyan); font-size: 31px; text-shadow: 2px 2px 0 #24144e; }
+.play-surface h2, .evidence-deck h2 { color: var(--cyan); font-size: 31px; text-shadow: 2px 2px 0 #6272a4; }
 .icon-button { width: 38px; height: 38px; border: 2px solid var(--yellow); background: var(--panel); color: var(--yellow); font-size: 24px; line-height: 1; }
 .icon-button:hover { background: var(--yellow); color: var(--night); }
 
 .control-rack { display: grid; grid-template-columns: auto minmax(100px, 1fr) auto minmax(100px, 1fr) auto; gap: 10px; align-items: center; padding: 16px 0; }
-label { color: #d9ddf7; font-size: 11px; font-weight: 600; }
-input { min-width: 0; height: 38px; border: 2px solid #36528e; background: #080824; color: var(--ink); padding: 8px; outline: none; }
-input:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(46, 233, 255, 0.18); }
+label { color: #d6d8e8; font-size: 11px; font-weight: 600; }
+input { min-width: 0; height: 38px; border: 2px solid #6272a4; background: var(--panel-deep); color: var(--ink); padding: 8px; outline: none; }
+input:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(139, 233, 253, 0.2); }
 .control-rack button, .action-grid button, .console-heading button {
   min-height: 38px;
   border: 2px solid var(--pink);
-  background: #31104d;
+  background: #44475a;
   color: var(--ink);
   padding: 8px 11px;
   font-size: 11px;
@@ -146,41 +147,41 @@ input:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(46, 233, 255
 .control-rack button:hover, .action-grid button:hover { background: var(--pink); color: var(--night); }
 
 .action-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; }
-.action-grid button:first-child { border-color: var(--cyan); background: #10335b; }
+.action-grid button:first-child { border-color: var(--cyan); background: #6272a4; }
 .action-grid button:first-child:hover { background: var(--cyan); color: var(--night); }
 
-.state-machine { min-height: 220px; margin-top: 18px; border: 2px solid #5666ba; background: #080829; padding: 14px; }
-.state-heading, .console-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: #fff0ad; font-size: 11px; font-weight: 600; }
+.state-machine { min-height: 220px; margin-top: 18px; border: 2px solid #6272a4; background: var(--panel-deep); padding: 14px; }
+.state-heading, .console-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--yellow); font-size: 11px; font-weight: 600; }
 .state-heading strong { color: var(--mint); }
 .state-tiles { display: flex; flex-wrap: wrap; gap: 10px; min-height: 136px; padding: 22px 4px 10px; align-content: center; }
-.state-tile { min-width: 58px; max-width: 150px; overflow: hidden; border: 2px solid var(--cyan); background: #11345d; color: var(--ink); padding: 10px; text-overflow: ellipsis; white-space: nowrap; box-shadow: 3px 3px 0 var(--pink); font-size: 12px; }
-.state-tile:nth-child(3n + 2) { border-color: var(--pink); background: #471149; box-shadow: 3px 3px 0 var(--yellow); }
-.state-tile:nth-child(3n) { border-color: var(--yellow); background: #594516; box-shadow: 3px 3px 0 var(--cyan); }
-.empty-state { margin: 0; padding: 40px 0; color: #69739f; text-align: center; font-size: 12px; font-weight: 700; }
+.state-tile { min-width: 58px; max-width: 150px; overflow: hidden; border: 2px solid var(--cyan); background: #44475a; color: var(--ink); padding: 10px; text-overflow: ellipsis; white-space: nowrap; box-shadow: 3px 3px 0 var(--purple); font-size: 12px; }
+.state-tile:nth-child(3n + 2) { border-color: var(--pink); background: #5a456b; box-shadow: 3px 3px 0 var(--yellow); }
+.state-tile:nth-child(3n) { border-color: var(--yellow); background: #5b5d45; box-shadow: 3px 3px 0 var(--cyan); }
+.empty-state { margin: 0; padding: 40px 0; color: #a4a8c7; text-align: center; font-size: 12px; font-weight: 700; }
 .empty-state.is-hidden { display: none; }
 
-.console-panel { margin-top: 18px; border: 2px solid #4b417f; background: #050519; }
-.console-heading { padding: 10px 12px; border-bottom: 1px solid #4b417f; }
-.console-heading button { min-height: auto; border-color: transparent; background: transparent; color: #aeb4d5; padding: 0; }
+.console-panel { margin-top: 18px; border: 2px solid #6272a4; background: var(--panel-deep); }
+.console-heading { padding: 10px 12px; border-bottom: 1px solid #6272a4; }
+.console-heading button { min-height: auto; border-color: transparent; background: transparent; color: #d6d8e8; padding: 0; }
 .console-heading button:hover { color: var(--yellow); }
 pre { max-height: 185px; overflow: auto; margin: 0; padding: 13px; color: var(--mint); font-size: 11px; line-height: 1.55; white-space: pre-wrap; word-break: break-word; }
 
 .evidence-deck {
   padding: 17px;
   background:
-    linear-gradient(rgba(3, 54, 146, 0.78), rgba(7, 13, 56, 0.96)),
-    #071542 url('/arcade-circuit.png') center / cover;
+    linear-gradient(rgba(98, 114, 164, 0.72), rgba(33, 34, 44, 0.96)),
+    #282a36 url('/arcade-circuit.png') center / cover;
   background-blend-mode: screen, normal;
-  box-shadow: 6px 6px 0 #075cc7, 10px 10px 0 rgba(1, 21, 85, 0.72);
+  box-shadow: 6px 6px 0 #6272a4, 10px 10px 0 rgba(33, 34, 44, 0.78);
 }
-.evidence-deck h2 { margin-bottom: 20px; color: #ff9cdd; font-size: 27px; }
+.evidence-deck h2 { margin-bottom: 20px; color: var(--pink); font-size: 27px; }
 dl { margin: 0; }
 dl div { padding: 12px 0; border-bottom: 1px solid var(--line); }
-dt { color: #cbd6ff; font-size: 10px; font-weight: 600; }
-dd { margin: 6px 0 0; color: #b9fff0; font-size: 12px; line-height: 1.4; }
-.boundary-note { margin-top: 22px; border-left: 4px solid var(--yellow); padding: 10px 0 10px 11px; background: rgba(255, 227, 78, 0.07); }
-.boundary-note span { color: #fff0ad; font-size: 10px; font-weight: 600; }
-.boundary-note p { margin: 7px 0 0; color: #f2f4ff; font-size: 12px; line-height: 1.45; }
+dt { color: #d6d8e8; font-size: 10px; font-weight: 600; }
+dd { margin: 6px 0 0; color: var(--mint); font-size: 12px; line-height: 1.4; }
+.boundary-note { margin-top: 22px; border-left: 4px solid var(--yellow); padding: 10px 0 10px 11px; background: rgba(241, 250, 140, 0.08); }
+.boundary-note span { color: var(--yellow); font-size: 10px; font-weight: 600; }
+.boundary-note p { margin: 7px 0 0; color: #f8f8f2; font-size: 12px; line-height: 1.45; }
 
 @media (max-width: 1040px) {
   .arcade-layout { grid-template-columns: 180px minmax(0, 1fr); }
