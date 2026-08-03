@@ -1,6 +1,6 @@
 CARGO ?= cargo
 
-.PHONY: build test run bench docker hash-tests test-original build-native submission-verify submission-demo
+.PHONY: build test run web bench docker hash-tests test-original build-native submission-verify submission-demo
 
 build:
 	$(CARGO) build --release --bin mnemonist
@@ -16,6 +16,9 @@ test-original:
 
 run:
 	$(CARGO) run --release --bin mnemonist -- --help
+
+web:
+	$(CARGO) run --release --bin mnemonist -- --web
 
 bench:
 	$(CARGO) run --release --bin bench

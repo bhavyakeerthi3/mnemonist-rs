@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#070725">
+  <title>Mnemo Arcade | Rust Protocol Playground</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div class="brand-lockup">
+        <p class="eyebrow">Port Mortem Track H / JavaScript to Rust</p>
+        <h1><span>MNEMO</span> ARCADE</h1>
+        <p class="brand-subtitle">Rust Protocol Playground</p>
+      </div>
+      <div class="runtime-status" aria-live="polite">
+        <span class="status-dot"></span>
+        <span id="runtime-status">CONNECTING</span>
+        <strong>RUST ONLY</strong>
+      </div>
+    </header>
+
+    <section class="score-strip" aria-label="Port evidence">
+      <div><span>UPSTREAM</span><strong>499 PASS</strong></div>
+      <div><span>RUST TESTS</span><strong>224</strong></div>
+      <div><span>UNSAFE</span><strong>0</strong></div>
+      <div><span>PROTOCOL</span><strong>JSONL 1</strong></div>
+    </section>
+
+    <section class="arcade-layout">
+      <nav class="collection-deck" aria-label="Collection selector">
+        <p class="panel-kicker">SELECT MODULE</p>
+        <button class="collection-button is-active" data-collection="stack"><span>01</span> STACK</button>
+        <button class="collection-button" data-collection="queue"><span>02</span> QUEUE</button>
+        <button class="collection-button" data-collection="lru"><span>03</span> LRU CACHE</button>
+        <button class="collection-button" data-collection="bit-vector"><span>04</span> BIT VECTOR</button>
+        <button class="collection-button" data-collection="symspell"><span>05</span> SYMSPELL</button>
+        <div class="deck-footer">LIVE RUST STATE<br>NO N-API</div>
+      </nav>
+
+      <section class="play-surface" aria-labelledby="module-title">
+        <header class="surface-header">
+          <div>
+            <p class="panel-kicker">ACTIVE COLLECTION</p>
+            <h2 id="module-title">STACK</h2>
+          </div>
+          <button class="icon-button" id="reset-button" type="button" title="Create a fresh collection">&#8635;</button>
+        </header>
+
+        <div class="control-rack">
+          <label id="primary-label" for="primary-input">VALUE</label>
+          <input id="primary-input" autocomplete="off" value="&quot;neon&quot;">
+          <label class="secondary-field" id="secondary-label" for="secondary-input">KEY</label>
+          <input class="secondary-field" id="secondary-input" autocomplete="off" value="&quot;alpha&quot;">
+          <button id="sample-button" type="button">LOAD SAMPLE</button>
+        </div>
+
+        <div class="action-grid" id="action-grid" aria-label="Collection actions"></div>
+
+        <section class="state-machine" aria-label="Rust collection state">
+          <div class="state-heading">
+            <span>RUST STATE BUFFER</span>
+            <strong id="collection-size">SIZE 0</strong>
+          </div>
+          <div class="state-tiles" id="state-tiles"></div>
+          <p class="empty-state" id="empty-state">READY FOR INPUT</p>
+        </section>
+
+        <section class="console-panel" aria-label="Protocol activity">
+          <div class="console-heading"><span>PROTOCOL TRACE</span><button id="clear-trace" type="button">CLEAR</button></div>
+          <pre id="protocol-trace"></pre>
+        </section>
+      </section>
+
+      <aside class="evidence-deck">
+        <p class="panel-kicker">LIVE RECEIPT</p>
+        <h2>NO SHORTCUTS.</h2>
+        <dl>
+          <div><dt>ENGINE</dt><dd id="engine-value">Checking...</dd></div>
+          <div><dt>TRANSPORT</dt><dd>HTTP to Rust Protocol</dd></div>
+          <div><dt>FUZZ TRACE</dt><dd>3,520 standalone ops</dd></div>
+          <div><dt>SOAK</dt><dd>100k checked requests</dd></div>
+        </dl>
+        <div class="boundary-note">
+          <span>BOUNDARY NOTE</span>
+          <p>State transitions run in Rust. Browser JavaScript only renders requests and responses.</p>
+        </div>
+      </aside>
+    </section>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>

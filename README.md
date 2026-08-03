@@ -109,6 +109,24 @@ docker build -t mnemonist-port .
 docker run --rm mnemonist-port --version
 ```
 
+## Interactive Rust Playground
+
+The repository includes a small browser demo for the standalone executable.
+It is an interface to the same Rust protocol executor used by the conformance
+tests: no N-API addon and no JavaScript implementation are loaded.
+
+```bash
+cargo run --release --bin mnemonist -- --web
+# open http://127.0.0.1:8787
+```
+
+The container exposes the same demo when bound to all interfaces:
+
+```bash
+docker build -t mnemonist-port .
+docker run --rm -p 8787:8787 -e MNEMONIST_WEB_ADDR=0.0.0.0:8787 mnemonist-port --web
+```
+
 ## Commands
 
 ```bash

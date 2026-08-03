@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 use std::env;
-use std::io::{self, BufRead, Write};
+use std::io::{self, BufRead, Read, Write};
+use std::net::{TcpListener, TcpStream};
+use std::time::Duration;
 
 use indexmap::{IndexMap, IndexSet};
 use mnemonist::set_ops;
@@ -15,6 +17,10 @@ use serde::Deserialize;
 use serde_json::{json, Value};
 
 const PROTOCOL_VERSION: u8 = 1;
+const WEB_INDEX: &str = include_str!("../web/index.html");
+const WEB_STYLES: &str = include_str!("../web/styles.css");
+const WEB_APP: &str = include_str!("../web/app.js");
+const WEB_BACKGROUND: &[u8] = include_bytes!("../web/arcade-circuit.png");
 
 #[derive(Debug, Deserialize)]
 struct Request {
@@ -1784,10 +1790,184 @@ fn execute(request: Request, collections: &mut HashMap<String, Collection>) -> V
     }
 }
 
+fn write_http_response(
+    stream: &mut TcpStream,
+    status: &str,
+    content_type: &str,
+    body: &[u8],
+) -> io::Result<()> {
+    write!(
+        stream,
+        "HTTP/1.1 {status}\r\nContent-Type: {content_type}\r\nContent-Length: {}\r\nCache-Control: no-store\r\nConnection: close\r\n\r\n",
+        body.len()
+    )?;
+    stream.write_all(body)
+}
+
+fn http_header_end(buffer: &[u8]) -> Option<usize> {
+    buffer.windows(4).position(|window| window == b"\r\n\r\n")
+}
+
+fn read_http_request(stream: &mut TcpStream) -> Result<(String, String, Vec<u8>), String> {
+    const MAX_REQUEST_BYTES: usize = 1_048_576;
+    let mut buffer = Vec::with_capacity(4096);
+    let mut chunk = [0_u8; 4096];
+    let mut header_end = None;
+    let mut content_length = 0;
+
+    loop {
+        let read = stream
+            .read(&mut chunk)
+            .map_err(|error| format!("HTTP read failure: {error}"))?;
+        if read == 0 {
+            return Err("HTTP request ended before headers".to_owned());
+        }
+        buffer.extend_from_slice(&chunk[..read]);
+        if buffer.len() > MAX_REQUEST_BYTES {
+            return Err("HTTP request exceeds 1 MiB".to_owned());
+        }
+
+        if header_end.is_none() {
+            if let Some(end) = http_header_end(&buffer) {
+                header_end = Some(end);
+                let headers = std::str::from_utf8(&buffer[..end])
+                    .map_err(|_| "HTTP headers are not UTF-8".to_owned())?;
+                content_length = headers
+                    .lines()
+                    .find_map(|line| {
+                        line.split_once(':').and_then(|(name, value)| {
+                            name.eq_ignore_ascii_case("content-length")
+                                .then(|| value.trim().parse::<usize>().ok())
+                                .flatten()
+                        })
+                    })
+                    .unwrap_or(0);
+            }
+        }
+
+        if let Some(end) = header_end {
+            let expected = end + 4 + content_length;
+            if buffer.len() >= expected {
+                let headers = std::str::from_utf8(&buffer[..end])
+                    .map_err(|_| "HTTP headers are not UTF-8".to_owned())?;
+                let mut request_line = headers.lines().next().unwrap_or("").split_whitespace();
+                let method = request_line
+                    .next()
+                    .ok_or_else(|| "HTTP request has no method".to_owned())?
+                    .to_owned();
+                let path = request_line
+                    .next()
+                    .ok_or_else(|| "HTTP request has no path".to_owned())?
+                    .split('?')
+                    .next()
+                    .unwrap_or("/")
+                    .to_owned();
+                return Ok((method, path, buffer[end + 4..expected].to_vec()));
+            }
+        }
+    }
+}
+
+fn handle_http_connection(
+    mut stream: TcpStream,
+    collections: &mut HashMap<String, Collection>,
+) -> io::Result<()> {
+    stream.set_read_timeout(Some(Duration::from_secs(5)))?;
+    let (method, path, body) = match read_http_request(&mut stream) {
+        Ok(request) => request,
+        Err(error) => {
+            let response = json!({"ok": false, "error": error}).to_string();
+            return write_http_response(
+                &mut stream,
+                "400 Bad Request",
+                "application/json; charset=utf-8",
+                response.as_bytes(),
+            );
+        }
+    };
+
+    match (method.as_str(), path.as_str()) {
+        ("GET", "/") => write_http_response(
+            &mut stream,
+            "200 OK",
+            "text/html; charset=utf-8",
+            WEB_INDEX.as_bytes(),
+        ),
+        ("GET", "/styles.css") => write_http_response(
+            &mut stream,
+            "200 OK",
+            "text/css; charset=utf-8",
+            WEB_STYLES.as_bytes(),
+        ),
+        ("GET", "/app.js") => write_http_response(
+            &mut stream,
+            "200 OK",
+            "application/javascript; charset=utf-8",
+            WEB_APP.as_bytes(),
+        ),
+        ("GET", "/arcade-circuit.png") => {
+            write_http_response(&mut stream, "200 OK", "image/png", WEB_BACKGROUND)
+        }
+        ("GET", "/api/health") => {
+            let response = json!({
+                "ok": true,
+                "engine": "Rust standalone executable",
+                "protocol": PROTOCOL_VERSION,
+                "unsafe_blocks": 0,
+            })
+            .to_string();
+            write_http_response(
+                &mut stream,
+                "200 OK",
+                "application/json; charset=utf-8",
+                response.as_bytes(),
+            )
+        }
+        ("POST", "/api/protocol") => {
+            let response = match serde_json::from_slice::<Request>(&body) {
+                Ok(request) => execute(request, collections),
+                Err(error) => failure(Value::Null, format!("invalid request: {error}")),
+            }
+            .to_string();
+            write_http_response(
+                &mut stream,
+                "200 OK",
+                "application/json; charset=utf-8",
+                response.as_bytes(),
+            )
+        }
+        _ => write_http_response(
+            &mut stream,
+            "404 Not Found",
+            "application/json; charset=utf-8",
+            br#"{"ok":false,"error":"route not found"}"#,
+        ),
+    }
+}
+
+fn serve_web(address: &str) -> io::Result<()> {
+    let listener = TcpListener::bind(address)?;
+    println!("Mnemo Arcade is running at http://{address}");
+    let mut collections = HashMap::new();
+
+    for stream in listener.incoming() {
+        match stream {
+            Ok(stream) => {
+                if let Err(error) = handle_http_connection(stream, &mut collections) {
+                    eprintln!("web request failed: {error}");
+                }
+            }
+            Err(error) => eprintln!("web accept failed: {error}"),
+        }
+    }
+
+    Ok(())
+}
+
 fn print_help() {
     println!("mnemonist JSONL protocol runner");
     println!("Reads one JSON request per stdin line and writes one JSON response per stdout line.");
-    println!("Supported collections: stack, queue, linked-list.");
+    println!("Use --web to host the Rust-only Mnemo Arcade playground.");
 }
 
 fn main() {
@@ -1798,6 +1978,15 @@ fn main() {
         }
         Some("--version") | Some("-V") => {
             println!("mnemonist-jsonl {PROTOCOL_VERSION}");
+            return;
+        }
+        Some("--web") => {
+            let address =
+                env::var("MNEMONIST_WEB_ADDR").unwrap_or_else(|_| "127.0.0.1:8787".to_owned());
+            if let Err(error) = serve_web(&address) {
+                eprintln!("failed to host Mnemo Arcade at {address}: {error}");
+                std::process::exit(1);
+            }
             return;
         }
         Some(argument) => {
