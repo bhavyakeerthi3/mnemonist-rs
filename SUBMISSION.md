@@ -1,5 +1,20 @@
 # Submission Scorecard
 
+## Judge Evidence Map
+
+| What to assess | Evidence | Reproduce or inspect |
+| --- | --- | --- |
+| Runnable Rust artifact | Node-free JSONL executable | `cargo build --release --no-default-features --bin mnemonist` |
+| Test integrity | 42 upstream files match the kickoff manifest | `npm run verify:original-tests` |
+| Functional parity | 499 passing unchanged upstream assertions, 1 preserved upstream pending | `npm run verify:submission` |
+| Rust quality | 224 release tests and zero handwritten `unsafe` | `cargo test --release`, `npm run check:zero-unsafe` |
+| Behavioral evidence | Seeded differential tests and 100k persistent-process soak | `fuzz/log.txt`, `npm run soak:standalone -- --requests=100000` |
+| Performance honesty | Warmed p50/p95/p99, startup, throughput, and scoped RSS methodology | `bench/results.json`, `bench/methodology.md` |
+| Architecture boundaries | Callback and GC semantics stated explicitly | `DECISIONS.md`, `evidence/standalone-boundaries.json` |
+| Live inspection | 41 Rust protocol modules in the browser playground | [mnemo-arcade-rust.vercel.app](https://mnemo-arcade-rust.vercel.app) |
+
+For a concise recorded walkthrough, follow [DEMO_SCRIPT.md](DEMO_SCRIPT.md).
+
 ## Artifact
 
 Build the submitted executable with:
