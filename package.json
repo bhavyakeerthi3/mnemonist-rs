@@ -1,0 +1,40 @@
+{
+  "name": "mnemonist-port",
+  "version": "0.1.0",
+  "license": "MIT",
+  "description": "Port Mortem: mnemonist JavaScript to Rust",
+  "main": "index.js",
+  "scripts": {
+    "build:standalone": "cargo build --release --bin mnemonist",
+    "build:native": "node scripts/build-native.js",
+    "hash-tests": "node scripts/hash-tests.js",
+    "verify:original-tests": "node scripts/verify-original-tests.js",
+    "check:zero-unsafe": "node scripts/check-zero-unsafe.js",
+    "verify:standalone-artifact": "node scripts/verify-standalone-artifact.js",
+    "test:original": "mocha \"tests/original/*.js\" --ignore \"tests/original/_utils.js\"",
+    "test:original:all-ported": "npm run build:native && npm run test:original",
+    "test:upstream-regressions": "mocha tests/upstream-skipped-regressions.js",
+    "test:bridge-regressions": "mocha tests/native-bridge-regressions.js",
+    "test:compatibility-boundaries": "mocha tests/compatibility-boundary-regressions.js",
+    "test:standalone": "npm run build:standalone && node scripts/test-standalone-protocol.js",
+    "test:original:standalone": "npm run build:standalone && node scripts/run-standalone-original.js",
+    "test:standalone:lru": "npm run build:standalone && mocha tests/standalone-lru.js",
+    "verify": "npm run verify:original-tests && npm run check:zero-unsafe && cargo test --release && npm run test:standalone && npm run test:original:standalone && npm run test:standalone:lru && npm run test:original:all-ported && npm run test:upstream-regressions && npm run test:bridge-regressions && npm run test:compatibility-boundaries",
+    "verify:submission": "npm run verify:original-tests && npm run verify:standalone-artifact && npm run check:zero-unsafe && npm run test:standalone && npm run test:original:standalone",
+    "demo:submission": "npm run verify:submission && npm run fuzz:standalone-symspell -- --duration-ms=120000 --steps=800 --seed=1592639710 && npm run fuzz:standalone-collections -- --duration-ms=120000 --steps=80 --seed=1592639710 && npm run soak:standalone -- --requests=100000",
+    "fuzz:differential": "node scripts/differential-fuzz.js",
+    "fuzz:standalone-symspell": "npm run build:standalone && node scripts/standalone-symspell-differential-fuzz.js",
+    "fuzz:standalone-collections": "npm run build:standalone && node scripts/standalone-collections-differential-fuzz.js",
+    "soak:standalone": "npm run build:standalone && node scripts/standalone-protocol-soak.js",
+    "bench:rust-rss": "cargo build --release --bin rss_bench && node scripts/benchmark-rust-rss.js",
+    "bench:distribution": "node scripts/benchmark-distribution.js"
+  },
+  "devDependencies": {
+    "damerau-levenshtein": "^1.0.5",
+    "leven": "3.1.0",
+    "lodash": "^4.17.21",
+    "mocha": "^11.7.6",
+    "obliterator": "^2.0.2",
+    "pandemonium": "^2.4.1"
+  }
+}

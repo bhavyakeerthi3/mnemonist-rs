@@ -1,0 +1,3 @@
+[submodule "original/mnemonist"]
+	path = original/mnemonist
+	url = https://github.com/Yomguithereal/mnemonist.git
