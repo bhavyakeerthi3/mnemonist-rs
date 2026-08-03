@@ -35,10 +35,10 @@ if (process.platform === 'win32' && mingwBins.length > 0) {
 const toolchain = process.env.MNEMONIST_RUST_TOOLCHAIN ||
   (process.platform === 'win32' && mingwBins.length > 0 ? 'stable-x86_64-pc-windows-gnu' : undefined);
 const cargoArgs = process.platform === 'win32' && toolchain ?
-  [`+${toolchain}`, 'build', '--release', '-Fnodejs', '--lib'] :
+  [`+${toolchain}`, 'build', '--release', '--no-default-features', '-Fnodejs', '--lib'] :
   process.platform === 'win32' ?
-    ['+stable-x86_64-pc-windows-msvc', 'build', '--release', '-Fnodejs', '--lib'] :
-    ['build', '--release', '-Fnodejs', '--lib'];
+    ['+stable-x86_64-pc-windows-msvc', 'build', '--release', '--no-default-features', '-Fnodejs', '--lib'] :
+    ['build', '--release', '--no-default-features', '-Fnodejs', '--lib'];
 
 run('cargo', cargoArgs);
 

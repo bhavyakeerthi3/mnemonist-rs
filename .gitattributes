@@ -1,0 +1,2 @@
+# Preserve the upstream fixture bytes consistently in every checkout.
+tests/original/** text eol=lf

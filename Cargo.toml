@@ -14,18 +14,21 @@ serde = { version = "1.0.210", features = ["derive"] }
 serde_json = "1.0.128"
 
 [target.'cfg(unix)'.dependencies]
-http-body-util = "0.1"
-tokio = { version = "1", features = ["full"] }
-vercel_runtime = "2.4.0"
+http-body-util = { version = "0.1", optional = true }
+tokio = { version = "1", features = ["full"], optional = true }
+vercel_runtime = { version = "2.4.0", optional = true }
 
 [[bin]]
 name = "protocol"
 path = "api/protocol.rs"
+required-features = ["web"]
 
 [[bin]]
 name = "health"
 path = "api/health.rs"
+required-features = ["web"]
 
 [features]
-default = []
+default = ["web"]
 nodejs = ["napi", "napi-derive"]
+web = ["dep:http-body-util", "dep:tokio", "dep:vercel_runtime"]

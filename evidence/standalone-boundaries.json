@@ -3,12 +3,13 @@
   "build": "cargo build --release --no-default-features --bin mnemonist",
   "source_runtime_linked": false,
   "napi_dependency_in_normal_tree": false,
+  "web_runtime_dependencies_in_submission_tree": false,
   "unsafe_blocks": 0,
   "upstream_test_route": {
     "active_module_files": 41,
     "passing_assertions": 499,
     "preserved_upstream_pending": 1,
-    "original_manifest": "A937FEAA87B49B97426BA6C6D8FEE9718E802262AE14B26335210CE68325D381"
+    "original_manifest": "5195E46CC0451C8F285B60EFB11BD280E1543840D8C631AB331FB76BBAC43BBE"
   },
   "rust_owned_protocol_state": [
     "core linear and bounded collections",

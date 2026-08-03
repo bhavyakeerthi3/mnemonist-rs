@@ -17,8 +17,8 @@
 | Evidence | Reproducible result |
 | --- | --- |
 | Preserved upstream tests | 42 kickoff-hashed files, **499 passing**, 1 upstream-owned pending |
-| Rust verification | **226 passing** release tests |
-| Submitted artifact | Rust-only JSONL executable, with no `napi` or `napi-derive` dependency |
+| Rust verification | **231 passing** release tests |
+| Submitted artifact | Rust-only JSONL executable, excluding Node and Vercel web-runtime dependencies |
 | Safety audit | **0 handwritten `unsafe`** blocks, functions, impls, or extern declarations |
 | Behavioral evidence | Seeded standalone differential fuzzing, a 100k-request persistent-protocol soak, and p50/p95/p99 plus RSS methodology |
 | Live demonstration | [Mnemo Arcade on Vercel](https://mnemo-arcade-rust.vercel.app): 41 Rust protocol modules, executed by Rust serverless functions |
@@ -61,8 +61,9 @@ scope. The distinction is recorded in `.port-mortem.toml`.
 npm run verify:submission
 ```
 
-Expected result: a runnable Rust-only `mnemonist` executable whose normal
-dependency tree excludes `napi`, a zero-unsafe audit, `33` JSONL protocol
+Expected result: a runnable Rust-only `mnemonist` executable whose submission
+dependency tree excludes `napi`, `tokio`, `vercel_runtime`, and `http-body-util`,
+a zero-unsafe audit, `39` JSONL protocol
 contract requests passing, and **499 unchanged upstream assertions** passing
 through the standalone executable. The command uses Node only to host the
 preserved JavaScript test files; Node is not linked into the artifact.
@@ -70,20 +71,20 @@ preserved JavaScript test files; Node is not linked into the artifact.
 available.
 
 For the broader compatibility validation, `npm run verify` additionally runs
-the hash check, **224** Rust tests, and the complete preserved suite
+the hash check, **231** Rust tests, and the complete preserved suite
 (`499 passing`, `1` upstream-owned pending). That result is intentionally
 reported separately from standalone Rust-only conformance.
 
 ## Current Status
 
 - Rust module tree mirrors the upstream root JS structure files.
-- `cargo build --release --bin mnemonist` produces a Node-free JSONL protocol runner. It is stateful across stdin requests and currently exposes Stack, Queue, LinkedList, FixedStack, FixedDeque, CircularBuffer, SparseSet, SparseQueueSet, SparseMap, BitSet, StaticDisjointSet, MultiArray, MultiSet, MultiMap, BiMap, Heap, FixedReverseHeap, FibonacciHeap, HashedArrayTree, Set helpers, BloomFilter, and LRU caches without enabling the optional N-API feature.
+- `cargo build --release --no-default-features --bin mnemonist` produces a Node-free JSONL protocol runner. It is stateful across stdin requests and currently exposes Stack, Queue, LinkedList, FixedStack, FixedDeque, CircularBuffer, SparseSet, SparseQueueSet, SparseMap, BitSet, StaticDisjointSet, MultiArray, MultiSet, MultiMap, BiMap, Heap, FixedReverseHeap, FibonacciHeap, HashedArrayTree, Set helpers, BloomFilter, and LRU caches without enabling N-API or the optional Vercel web feature.
 - Builds cleanly on a standard host toolchain with plain `cargo build` / `make build` — no Windows-only cross-target lock required.
-- Rust-native parity tests: **226 passing, 0 failing** (`cargo test --release`), including eight independent Stack/Queue instances under parallel thread load. This checks Rust instance isolation, not a claim that a single JavaScript object has concurrent mutation semantics.
+- Rust-native parity tests: **231 passing, 0 failing** (`cargo test --release --no-default-features`), including eight independent Stack/Queue instances under parallel thread load. This checks Rust instance isolation, not a claim that a single JavaScript object has concurrent mutation semantics.
 - Original upstream suite: **41 of 41 active module files, 499 passing assertions, 0 failing, 1 preserved upstream-pending test** (`npm run test:original:all-ported`). The pending upstream issue #196 cases run as two passing un-hashed supplemental regressions in `npm run verify`; the original file remains hash-identical.
 - Standalone conformance subset: **499 passing unchanged upstream assertions** for every active upstream module file. This route uses the release Rust executable only; it deliberately does not load `mnemonist.node`. Arbitrary JavaScript distance/tokenizer/comparator callbacks, map factories and fuzzy hash callbacks, token-array trie/suffix inputs, interval getters, and BKTree/VPTree non-string values remain explicit adapter fallbacks. Opaque handles preserve JavaScript object identity for Rust-owned map/cache state. DefaultWeakMap uses host `WeakRef`/`WeakMap` retention and records a Rust `release` operation through `FinalizationRegistry` when a key is collected; finalizer scheduling remains host-GC dependent.
 - Standalone LRU regressions: `npm run test:standalone:lru` exercises Rust-backed promotion, eviction, ordered iteration, `setpop`, deletion, object identity, and stored `undefined` through the JSONL protocol. JavaScript values cross as opaque handles; Rust owns all LRU state.
-- Kickoff test manifest: verified unchanged (`A937FE...25D381`). This is the reproducible SHA-256 manifest for the 42 files in `tests/original`, each byte-for-byte identical to the pinned upstream checkout at `1f2c752`.
+- Kickoff test manifest: verified unchanged (`5195E46C...AC43BBE`). This SHA-256 manifest covers the 42 root files in `tests/original` using Git's committed blob bytes, after first rejecting any worktree edits. It remains stable across `core.autocrlf` and other checkout line-ending policies.
 - Phase 6 clean-room verification: fresh source-only copy completed `npm install`, `cargo build --release`, `cargo test`, and `npm run test:original:all-ported` successfully.
 - Delivery archive: a source-only archive excludes generated build output, dependencies, native binaries, and Git metadata; its extracted contents passed the same clean-room sequence.
 - Differential evidence: a seeded 135-second upstream-JS versus N-API campaign completed 21,237,797 synchronized Stack/Queue/LinkedList/FixedStack/FixedDeque/BitVector/LRUCache/LRUCacheWithDelete/typed-Vector operations without divergence in the documented upstream-consistent domains; details are in `fuzz/log.txt` and `UPSTREAM_FINDINGS.md`.
@@ -166,8 +167,8 @@ docker run --rm -p 8787:8787 -e MNEMONIST_WEB_ADDR=0.0.0.0:8787 mnemonist-port -
 ```bash
 make submission-verify # Rust-only artifact, dependency boundary, and standalone evidence
 npm run demo:submission # verification plus deterministic standalone differential fuzz
-make build           # cargo build --release --bin mnemonist; produces the JSONL runner
-make test            # cargo test — the Rust-native parity suite (224 tests)
+make build           # cargo build --release --no-default-features --bin mnemonist
+make test            # cargo test --release --no-default-features (231 tests)
 make build-native    # npm run build:native — compiles mnemonist.node (N-API addon)
 make test-original    # npm run test:original:all-ported — builds the addon, then runs
                        # the *unmodified* original JS suite from tests/original/ against it
@@ -178,7 +179,7 @@ npm run soak:standalone -- --requests=100000 # checked persistent-protocol soak
 npm run bench:rust-rss                # Rust retained-workload RSS sample
 make run
 make bench
-make hash-tests      # cross-platform (bash on Linux/macOS, PowerShell on Windows)
+make hash-tests      # committed-blob manifest, stable across checkout EOL settings
 ```
 
 The Rust-only commands run with a stock stable Rust toolchain. On Windows,

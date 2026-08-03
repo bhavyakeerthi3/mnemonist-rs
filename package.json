@@ -5,7 +5,7 @@
   "description": "Port Mortem: mnemonist JavaScript to Rust",
   "main": "index.js",
   "scripts": {
-    "build:standalone": "cargo build --release --bin mnemonist",
+    "build:standalone": "cargo build --release --no-default-features --bin mnemonist",
     "build:native": "node scripts/build-native.js",
     "hash-tests": "node scripts/hash-tests.js",
     "verify:original-tests": "node scripts/verify-original-tests.js",
@@ -19,14 +19,14 @@
     "test:standalone": "npm run build:standalone && node scripts/test-standalone-protocol.js",
     "test:original:standalone": "npm run build:standalone && node scripts/run-standalone-original.js",
     "test:standalone:lru": "npm run build:standalone && mocha tests/standalone-lru.js",
-    "verify": "npm run verify:original-tests && npm run check:zero-unsafe && cargo test --release && npm run test:standalone && npm run test:original:standalone && npm run test:standalone:lru && npm run test:original:all-ported && npm run test:upstream-regressions && npm run test:bridge-regressions && npm run test:compatibility-boundaries",
+    "verify": "npm run verify:original-tests && npm run check:zero-unsafe && cargo test --release --no-default-features && npm run test:standalone && npm run test:original:standalone && npm run test:standalone:lru && npm run test:original:all-ported && npm run test:upstream-regressions && npm run test:bridge-regressions && npm run test:compatibility-boundaries",
     "verify:submission": "npm run verify:original-tests && npm run verify:standalone-artifact && npm run check:zero-unsafe && npm run test:standalone && npm run test:original:standalone",
     "demo:submission": "npm run verify:submission && npm run fuzz:standalone-symspell -- --duration-ms=120000 --steps=800 --seed=1592639710 && npm run fuzz:standalone-collections -- --duration-ms=120000 --steps=80 --seed=1592639710 && npm run soak:standalone -- --requests=100000",
     "fuzz:differential": "node scripts/differential-fuzz.js",
     "fuzz:standalone-symspell": "npm run build:standalone && node scripts/standalone-symspell-differential-fuzz.js",
     "fuzz:standalone-collections": "npm run build:standalone && node scripts/standalone-collections-differential-fuzz.js",
     "soak:standalone": "npm run build:standalone && node scripts/standalone-protocol-soak.js",
-    "bench:rust-rss": "cargo build --release --bin rss_bench && node scripts/benchmark-rust-rss.js",
+    "bench:rust-rss": "cargo build --release --no-default-features --bin rss_bench && node scripts/benchmark-rust-rss.js",
     "bench:distribution": "node scripts/benchmark-distribution.js"
   },
   "devDependencies": {

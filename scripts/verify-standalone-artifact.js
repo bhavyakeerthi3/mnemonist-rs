@@ -20,8 +20,8 @@ function run(command, args, options = {}) {
 }
 
 const tree = run('cargo', ['tree', '--no-default-features', '-e', 'normal']);
-if (/\bnapi(?:-derive)? v/.test(tree)) {
-  throw new Error('standalone dependency tree includes the optional Node N-API bridge');
+if (/\b(?:napi(?:-derive)?|tokio|vercel_runtime|http-body-util) v/.test(tree)) {
+  throw new Error('standalone dependency tree includes an excluded Node or web-runtime dependency');
 }
 
 run('cargo', ['build', '--release', '--no-default-features', '--bin', 'mnemonist'], {

@@ -7,7 +7,7 @@
 | Runnable Rust artifact | Node-free JSONL executable | `cargo build --release --no-default-features --bin mnemonist` |
 | Test integrity | 42 upstream files match the kickoff manifest | `npm run verify:original-tests` |
 | Functional parity | 499 passing unchanged upstream assertions, 1 preserved upstream pending | `npm run verify:submission` |
-| Rust quality | 224 release tests and zero handwritten `unsafe` | `cargo test --release`, `npm run check:zero-unsafe` |
+| Rust quality | 231 release tests and zero handwritten `unsafe` | `cargo test --release --no-default-features`, `npm run check:zero-unsafe` |
 | Behavioral evidence | Seeded differential tests and 100k persistent-process soak | `fuzz/log.txt`, `npm run soak:standalone -- --requests=100000` |
 | Performance honesty | Warmed p50/p95/p99, startup, throughput, and scoped RSS methodology | `bench/results.json`, `bench/methodology.md` |
 | Architecture boundaries | Callback and GC semantics stated explicitly | `DECISIONS.md`, `evidence/standalone-boundaries.json` |
@@ -23,7 +23,8 @@ cargo build --release --no-default-features --bin mnemonist
 
 The result is `target/release/mnemonist`, a Rust JSONL executable. It does not
 link Node or N-API. `npm run verify:standalone-artifact` enforces that the
-normal Rust dependency tree excludes `napi` and `napi-derive`.
+submission dependency tree excludes `napi`, `napi-derive`, `tokio`,
+`vercel_runtime`, and `http-body-util`.
 
 ## Track H Scope
 
@@ -42,7 +43,7 @@ npm run verify:submission
 ```
 
 Latest checked result: all 42 original-test files match kickoff hash
-`A937FEAA87B49B97426BA6C6D8FEE9718E802262AE14B26335210CE68325D381`; the
+`5195E46CC0451C8F285B60EFB11BD280E1543840D8C631AB331FB76BBAC43BBE`; the
 standalone route reports 499 passing assertions and one unchanged upstream
 `it.skip` for suffix-array issue #196. The no-unsafe audit reports zero unsafe
 blocks, functions, implementations, and extern declarations.

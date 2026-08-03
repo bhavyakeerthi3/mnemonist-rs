@@ -8,12 +8,12 @@ phases are intentionally not kept here.
 ## Verification Snapshot
 
 - The 42 preserved files in `tests/original/` match the kickoff SHA-256
-  manifest: `A937FEAA87B49B97426BA6C6D8FEE9718E802262AE14B26335210CE68325D381`.
+  manifest: `5195E46CC0451C8F285B60EFB11BD280E1543840D8C631AB331FB76BBAC43BBE`.
 - The unchanged upstream suite reports **499 passing** assertions. One
   upstream-owned `it.skip` for suffix-array issue #196 remains pending in the
   hash-preserved test file; its two regression cases run as supplemental,
   passing tests.
-- `cargo test --release` reports **226 passing** Rust tests.
+- `cargo test --release --no-default-features` reports **231 passing** Rust tests.
 - `npm run verify:submission` verifies the manifest, Rust-only artifact,
   zero-unsafe audit, JSONL protocol contract, and the preserved standalone
   test path.
@@ -41,9 +41,11 @@ implementation.
 cargo build --release --no-default-features --bin mnemonist
 ```
 
-The executable is a persistent JSONL protocol runner. Its normal dependency
-tree excludes `napi` and `napi-derive`; `npm run verify:standalone-artifact`
-checks that boundary and runs `mnemonist --version`.
+The executable is a persistent JSONL protocol runner. Its submission dependency
+tree excludes `napi`, `napi-derive`, `tokio`, `vercel_runtime`, and
+`http-body-util`; `npm run verify:standalone-artifact` checks that boundary and
+runs `mnemonist --version`. The Vercel functions are separately feature-gated
+behind `web` so they do not affect the submitted binary.
 
 Node remains the host for the unmodified JavaScript test files. It is not
 linked into the release executable and the executable does not load a
@@ -131,9 +133,10 @@ not hidden fallbacks.
 
 ## 8. Original Tests Stay Untouched
 
-`tests/original/` is the judge-facing north star. The manifest verification is
-cross-platform, using PowerShell on Windows and a Bash implementation on
-Linux/macOS. New Rust tests, differential harnesses, and supplemental
+`tests/original/` is the judge-facing north star. The manifest verification
+first rejects worktree edits, then hashes Git's committed blobs rather than
+checkout bytes. This keeps the result stable across Windows CRLF and Unix LF
+checkout policies. New Rust tests, differential harnesses, and supplemental
 regressions live outside the preserved upstream test directory.
 
 The suffix-array issue #196 pending case is not removed or rewritten. It stays

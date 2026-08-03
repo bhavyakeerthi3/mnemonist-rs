@@ -3,13 +3,13 @@ CARGO ?= cargo
 .PHONY: build test run web bench docker hash-tests test-original build-native submission-verify submission-demo
 
 build:
-	$(CARGO) build --release --bin mnemonist
+	$(CARGO) build --release --no-default-features --bin mnemonist
 
 build-native:
 	npm run build:native
 
 test:
-	$(CARGO) test
+	$(CARGO) test --release --no-default-features
 
 test-original:
 	npm run test:original:all-ported
