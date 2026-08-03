@@ -17,7 +17,9 @@ body {
   min-width: 320px;
   margin: 0;
   color: var(--ink);
-  background: #05051e url('/arcade-circuit.png') center top / cover fixed;
+  background:
+    linear-gradient(135deg, rgba(238, 13, 163, 0.86), rgba(108, 4, 81, 0.92)),
+    #7b075f url('/arcade-circuit.png') center top / cover fixed;
   font-family: "Courier New", Courier, monospace;
 }
 
@@ -163,7 +165,14 @@ input:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(46, 233, 255
 .console-heading button:hover { color: var(--yellow); }
 pre { max-height: 185px; overflow: auto; margin: 0; padding: 13px; color: var(--mint); font-size: 11px; line-height: 1.55; white-space: pre-wrap; word-break: break-word; }
 
-.evidence-deck { padding: 17px; }
+.evidence-deck {
+  padding: 17px;
+  background:
+    linear-gradient(rgba(3, 54, 146, 0.78), rgba(7, 13, 56, 0.96)),
+    #071542 url('/arcade-circuit.png') center / cover;
+  background-blend-mode: screen, normal;
+  box-shadow: 6px 6px 0 #075cc7, 10px 10px 0 rgba(1, 21, 85, 0.72);
+}
 .evidence-deck h2 { margin-bottom: 20px; color: var(--pink); font-size: 28px; }
 dl { margin: 0; }
 dl div { padding: 12px 0; border-bottom: 1px solid var(--line); }
