@@ -41,7 +41,7 @@ button { cursor: pointer; }
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-  padding: 12px 18px 18px;
+  padding: 16px 18px 20px;
   border-bottom: 2px solid var(--cyan);
   background: rgba(33, 34, 44, 0.9);
   box-shadow: 0 0 0 4px rgba(189, 147, 249, 0.2), 0 0 28px rgba(139, 233, 253, 0.16);
@@ -53,25 +53,28 @@ button { cursor: pointer; }
   font-family: "Press Start 2P", "Courier New", monospace;
   font-size: 9px;
   font-weight: 600;
-  letter-spacing: 1px;
+  letter-spacing: 0;
+  line-height: 1.7;
 }
 
 .brand-lockup h1, .play-surface h2, .evidence-deck h2 {
   margin: 2px 0 0;
   font-family: "Press Start 2P", "Courier New", monospace;
   font-weight: 800;
-  letter-spacing: 1px;
-  line-height: 0.95;
+  letter-spacing: 0;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
 .brand-lockup h1 {
+  margin-top: 12px;
   color: var(--ink);
-  font-size: clamp(28px, 4vw, 50px);
+  font-size: clamp(25px, 3.4vw, 44px);
   text-shadow: 2px 2px 0 #6272a4, 4px 4px 0 #21222c;
 }
 
 .brand-lockup h1 span { color: var(--cyan); }
-.brand-subtitle { margin: 9px 0 0; color: #d6d8e8; font-size: 13px; font-weight: 400; }
+.brand-subtitle { margin: 12px 0 0; color: #d6d8e8; font-size: 16px; font-weight: 400; line-height: 1.2; }
 
 .runtime-status {
   display: grid;
@@ -134,6 +137,8 @@ button { cursor: pointer; }
   font-family: "Press Start 2P", "Courier New", monospace;
   font-size: 9px;
   font-weight: 600;
+  line-height: 1.5;
+  padding: 6px 0;
 }
 .collection-button span { color: var(--pink); font-size: 11px; }
 .collection-button:hover, .collection-button.is-active { border-left-color: var(--yellow); background: rgba(98, 114, 164, 0.5); color: var(--yellow); }
@@ -141,7 +146,7 @@ button { cursor: pointer; }
 
 .play-surface { min-width: 0; padding: 20px; }
 .surface-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding-bottom: 15px; border-bottom: 1px solid var(--line); }
-.play-surface h2, .evidence-deck h2 { color: var(--cyan); font-size: 22px; text-shadow: 2px 2px 0 #6272a4; }
+.play-surface h2, .evidence-deck h2 { color: var(--cyan); font-size: 20px; text-shadow: 2px 2px 0 #6272a4; }
 .icon-button { width: 38px; height: 38px; border: 2px solid var(--yellow); background: var(--panel); color: var(--yellow); font-size: 24px; line-height: 1; }
 .icon-button:hover { background: var(--yellow); color: var(--night); }
 
@@ -183,6 +188,7 @@ input:focus { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(139, 233, 25
 pre { max-height: 185px; overflow: auto; margin: 0; padding: 13px; color: var(--mint); font-size: 16px; line-height: 1.15; white-space: pre-wrap; word-break: break-word; }
 
 .evidence-deck {
+  min-width: 0;
   padding: 17px;
   background:
     linear-gradient(rgba(98, 114, 164, 0.72), rgba(33, 34, 44, 0.96)),
@@ -190,7 +196,7 @@ pre { max-height: 185px; overflow: auto; margin: 0; padding: 13px; color: var(--
   background-blend-mode: screen, normal;
   box-shadow: 6px 6px 0 #6272a4, 10px 10px 0 rgba(33, 34, 44, 0.78);
 }
-.evidence-deck h2 { margin-bottom: 20px; color: var(--pink); font-size: 27px; }
+.evidence-deck h2 { max-width: 100%; margin-bottom: 20px; color: var(--pink); font-size: 18px; line-height: 1.4; overflow-wrap: anywhere; }
 dl { margin: 0; }
 dl div { padding: 12px 0; border-bottom: 1px solid var(--line); }
 dt { color: #d6d8e8; font-size: 10px; font-weight: 600; }
