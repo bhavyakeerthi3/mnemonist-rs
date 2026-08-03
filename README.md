@@ -17,7 +17,7 @@
 | Evidence | Reproducible result |
 | --- | --- |
 | Preserved upstream tests | 42 kickoff-hashed files, **499 passing**, 1 upstream-owned pending |
-| Rust verification | **224 passing** release tests |
+| Rust verification | **226 passing** release tests |
 | Submitted artifact | Rust-only JSONL executable, with no `napi` or `napi-derive` dependency |
 | Safety audit | **0 handwritten `unsafe`** blocks, functions, impls, or extern declarations |
 | Behavioral evidence | Seeded standalone differential fuzzing, a 100k-request persistent-protocol soak, and p50/p95/p99 plus RSS methodology |
@@ -79,7 +79,7 @@ reported separately from standalone Rust-only conformance.
 - Rust module tree mirrors the upstream root JS structure files.
 - `cargo build --release --bin mnemonist` produces a Node-free JSONL protocol runner. It is stateful across stdin requests and currently exposes Stack, Queue, LinkedList, FixedStack, FixedDeque, CircularBuffer, SparseSet, SparseQueueSet, SparseMap, BitSet, StaticDisjointSet, MultiArray, MultiSet, MultiMap, BiMap, Heap, FixedReverseHeap, FibonacciHeap, HashedArrayTree, Set helpers, BloomFilter, and LRU caches without enabling the optional N-API feature.
 - Builds cleanly on a standard host toolchain with plain `cargo build` / `make build` — no Windows-only cross-target lock required.
-- Rust-native parity tests: **224 passing, 0 failing** (`cargo test --release`), including eight independent Stack/Queue instances under parallel thread load. This checks Rust instance isolation, not a claim that a single JavaScript object has concurrent mutation semantics.
+- Rust-native parity tests: **226 passing, 0 failing** (`cargo test --release`), including eight independent Stack/Queue instances under parallel thread load. This checks Rust instance isolation, not a claim that a single JavaScript object has concurrent mutation semantics.
 - Original upstream suite: **41 of 41 active module files, 499 passing assertions, 0 failing, 1 preserved upstream-pending test** (`npm run test:original:all-ported`). The pending upstream issue #196 cases run as two passing un-hashed supplemental regressions in `npm run verify`; the original file remains hash-identical.
 - Standalone conformance subset: **499 passing unchanged upstream assertions** for every active upstream module file. This route uses the release Rust executable only; it deliberately does not load `mnemonist.node`. Arbitrary JavaScript distance/tokenizer/comparator callbacks, map factories and fuzzy hash callbacks, token-array trie/suffix inputs, interval getters, and BKTree/VPTree non-string values remain explicit adapter fallbacks. Opaque handles preserve JavaScript object identity for Rust-owned map/cache state. DefaultWeakMap uses host `WeakRef`/`WeakMap` retention and records a Rust `release` operation through `FinalizationRegistry` when a key is collected; finalizer scheduling remains host-GC dependent.
 - Standalone LRU regressions: `npm run test:standalone:lru` exercises Rust-backed promotion, eviction, ordered iteration, `setpop`, deletion, object identity, and stored `undefined` through the JSONL protocol. JavaScript values cross as opaque handles; Rust owns all LRU state.

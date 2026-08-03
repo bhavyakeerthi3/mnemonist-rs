@@ -13,7 +13,7 @@ phases are intentionally not kept here.
   upstream-owned `it.skip` for suffix-array issue #196 remains pending in the
   hash-preserved test file; its two regression cases run as supplemental,
   passing tests.
-- `cargo test --release` reports **224 passing** Rust tests.
+- `cargo test --release` reports **226 passing** Rust tests.
 - `npm run verify:submission` verifies the manifest, Rust-only artifact,
   zero-unsafe audit, JSONL protocol contract, and the preserved standalone
   test path.
@@ -86,13 +86,25 @@ evidence rather than an assumed internal layout.
 ## 6. Advanced Algorithms and Exact Semantics
 
 Advanced structures are implemented as Rust algorithms and validated against
-observable results rather than superficial API shape. The notable choices are:
+observable results *and* their relevant structural invariants. The notable
+choices are:
 
 - `SymSpell` uses unrestricted Damerau-Levenshtein distance and preserves
   upstream suggestion ordering and duplicate counts.
-- `VPTree`, `BKTree`, and `PassjoinIndex` provide standalone string-native
-  paths using `leven`; distance callbacks and non-JSON inputs remain host
-  boundaries.
+- `KdTree` is a median-split tree of axis-tagged nodes. Its standalone `nearest`
+  path uses branch-and-bound search and preserves Mnemonist's equal-distance
+  pivot tie behavior. The convenience `add` API rebuilds the balanced static
+  tree rather than degrading queries into a flat scan.
+- `BKTree` is a distance-keyed node tree. Levenshtein search visits only child
+  edges within the query's admissible radius; insertion retains duplicate
+  entries as the upstream structure does.
+- `FibonacciHeap` is a safe arena-backed Fibonacci heap: circular root and
+  child lists use stable vector indices, and `pop` promotes children then
+  consolidates equal-degree roots. The standalone default comparator path uses
+  this structure directly. Arbitrary JavaScript comparator closures remain a
+  documented host-callback boundary.
+- `VPTree` and `PassjoinIndex` provide standalone string-native paths using
+  `leven`; distance callbacks and non-JSON inputs remain host boundaries.
 - Trie, suffix-array, interval, sparse, Bloom filter, bit-vector, heap, and
   map paths have Rust parity and protocol coverage appropriate to their public
   surface.

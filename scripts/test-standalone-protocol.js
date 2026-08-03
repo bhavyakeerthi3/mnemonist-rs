@@ -45,7 +45,13 @@ const requests = [
   { id: 'comparator', op: 'call', method: 'pushCompared', args: [1, [[1, 1, 0], [1, 3, -1], [3, 1, 1], [3, 3, 0]]] },
   { id: 'comparator', op: 'call', method: 'peekCompared', args: [[[1, 1, 0], [1, 3, -1], [3, 1, 1], [3, 3, 0]]] },
   { id: 'comparator', op: 'call', method: 'replaceCompared', args: [2, [[1, 1, 0], [1, 2, -1], [1, 3, -1], [2, 1, 1], [2, 2, 0], [2, 3, -1], [3, 1, 1], [3, 2, 1], [3, 3, 0]]] },
-  { id: 'comparator', op: 'call', method: 'consumeCompared', args: [[[2, 2, 0], [2, 3, -1], [3, 2, 1], [3, 3, 0]]] }
+  { id: 'comparator', op: 'call', method: 'consumeCompared', args: [[[2, 2, 0], [2, 3, -1], [3, 2, 1], [3, 3, 0]]] },
+  { id: 'fibonacci', op: 'create', kind: 'fibonacci-heap' },
+  { id: 'fibonacci', op: 'call', method: 'push', args: [8] },
+  { id: 'fibonacci', op: 'call', method: 'push', args: [1] },
+  { id: 'fibonacci', op: 'call', method: 'push', args: [3] },
+  { id: 'fibonacci', op: 'call', method: 'pop' },
+  { id: 'fibonacci', op: 'call', method: 'consume' }
 ];
 
 const run = childProcess.spawnSync(executable, [], {
@@ -80,6 +86,7 @@ assert.deepStrictEqual(responses[0].result.value, {
     'multi-map',
     'bi-map',
     'heap',
+    'fibonacci-heap',
     'fixed-reverse-heap',
     'hashed-array-tree',
     'set-ops',
@@ -128,5 +135,7 @@ assert.deepStrictEqual(responses[26].result, { kind: 'value', value: false });
 assert.deepStrictEqual(responses[30].result, { kind: 'value', value: 1 });
 assert.deepStrictEqual(responses[31].result, { kind: 'value', value: 1 });
 assert.deepStrictEqual(responses[32].result, { kind: 'value', value: [2, 3] });
+assert.deepStrictEqual(responses[37].result, { kind: 'value', value: 1 });
+assert.deepStrictEqual(responses[38].result, { kind: 'value', value: [3, 8] });
 
 console.log(`standalone protocol: ${responses.length} stateful requests passed`);

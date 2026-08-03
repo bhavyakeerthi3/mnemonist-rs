@@ -7,14 +7,14 @@ use std::time::Duration;
 use indexmap::{IndexMap, IndexSet};
 use mnemonist::set_ops;
 use mnemonist::{
-    BiMap, BitSet, BitVector, BkTree, CircularBuffer, CritBitTreeMap, FixedDeque, FixedReverseHeap,
-    FixedStack, GeneralizedSuffixArray, HashedArrayTree, Heap, Interval, JsBloomFilter, LinkedList,
-    LruCache, MultiArray, MultiMap, MultiMapContainer, MultiSet, Queue, SparseMap, SparseQueueSet,
-    SparseSet, Stack, StaticDisjointSet, StaticIntervalTree, SuffixArray, SymSpell, TrieMap,
-    Vector,
+    BiMap, BitSet, BitVector, BkTree, CircularBuffer, CritBitTreeMap, FibonacciHeap, FixedDeque,
+    FixedReverseHeap, FixedStack, GeneralizedSuffixArray, HashedArrayTree, Heap, Interval,
+    JsBloomFilter, KdTree, LinkedList, LruCache, MultiArray, MultiMap, MultiMapContainer, MultiSet,
+    Queue, SparseMap, SparseQueueSet, SparseSet, Stack, StaticDisjointSet, StaticIntervalTree,
+    SuffixArray, SymSpell, TrieMap, Vector,
 };
 use serde::Deserialize;
-use serde_json::{json, Value};
+use serde_json::{Value, json};
 
 const PROTOCOL_VERSION: u8 = 1;
 const WEB_INDEX: &str = include_str!("../web/index.html");
@@ -90,6 +90,7 @@ struct ProtocolPassjoinIndex {
 struct ProtocolKdTree {
     labels: Vec<Value>,
     points: Vec<Vec<f64>>,
+    tree: KdTree,
 }
 
 #[derive(Default)]
@@ -262,16 +263,10 @@ impl ProtocolFuzzyMultiMap {
 
 impl ProtocolKdTree {
     fn nearest(&self, k: usize, query: &[f64]) -> Vec<Value> {
-        let mut indices: Vec<_> = (0..self.points.len()).collect();
-        indices.sort_by(|left, right| {
-            squared_distance(&self.points[*left], query)
-                .total_cmp(&squared_distance(&self.points[*right], query))
-                .then_with(|| right.cmp(left))
-        });
-        indices
+        self.tree
+            .nearest(query, k)
             .into_iter()
-            .take(k)
-            .map(|index| self.labels[index].clone())
+            .map(|(value, _)| value.clone())
             .collect()
     }
 
@@ -345,6 +340,7 @@ enum Collection {
     MultiMap(MultiMap),
     BiMap(BiMap),
     Heap(Heap),
+    FibonacciHeap(FibonacciHeap),
     FixedReverseHeap(FixedReverseHeap),
     HashedArrayTree(HashedArrayTree),
     SetOps,
@@ -425,6 +421,7 @@ impl Collection {
             Self::MultiMap(_) => "multi-map",
             Self::BiMap(_) => "bi-map",
             Self::Heap(_) => "heap",
+            Self::FibonacciHeap(_) => "fibonacci-heap",
             Self::FixedReverseHeap(_) => "fixed-reverse-heap",
             Self::HashedArrayTree(_) => "hashed-array-tree",
             Self::SetOps => "set-ops",
@@ -473,6 +470,7 @@ impl Collection {
             Self::MultiMap(collection) => collection.size(),
             Self::BiMap(collection) => collection.size(),
             Self::Heap(collection) => collection.size(),
+            Self::FibonacciHeap(collection) => collection.size(),
             Self::FixedReverseHeap(collection) => collection.size(),
             Self::HashedArrayTree(collection) => collection.size(),
             Self::SetOps => 0,
@@ -538,6 +536,7 @@ impl Collection {
                 .map(|(key, value)| json!([key, value]))
                 .collect(),
             Self::Heap(collection) => collection.to_array(),
+            Self::FibonacciHeap(collection) => collection.to_array(),
             Self::FixedReverseHeap(collection) => collection.to_array(),
             Self::HashedArrayTree(collection) => collection.to_array(),
             Self::SetOps => Vec::new(),
@@ -902,6 +901,19 @@ impl Collection {
                 "toArray" => Ok(value_result(json!(collection.to_array()))),
                 "size" => Ok(value_result(json!(collection.size()))),
                 _ => Err(format!("unsupported heap method: {method}")),
+            },
+            Self::FibonacciHeap(collection) => match method {
+                "clear" => {
+                    collection.clear();
+                    Ok(void_result())
+                }
+                "push" => Ok(value_result(json!(collection.push(argument(args, 0)?)))),
+                "peek" => Ok(option_ref_result(collection.peek())),
+                "pop" => Ok(option_result(collection.pop())),
+                "consume" => Ok(value_result(json!(collection.consume()))),
+                "toArray" => Ok(value_result(json!(collection.to_array()))),
+                "size" => Ok(value_result(json!(collection.size()))),
+                _ => Err(format!("unsupported fibonacci-heap method: {method}")),
             },
             Self::FixedReverseHeap(collection) => match method {
                 "clear" => { collection.clear(); Ok(void_result()) }
@@ -1545,6 +1557,13 @@ fn create(kind: &str, args: &[Value]) -> Result<Collection, String> {
                 Heap::new_min()
             },
         )),
+        "fibonacci-heap" => Ok(Collection::FibonacciHeap(
+            if args.first().and_then(Value::as_bool).unwrap_or(false) {
+                FibonacciHeap::new_max()
+            } else {
+                FibonacciHeap::new_min()
+            },
+        )),
         "fixed-reverse-heap" => Ok(Collection::FixedReverseHeap(FixedReverseHeap::new(
             capacity(args)?,
         ))),
@@ -1673,6 +1692,7 @@ fn create(kind: &str, args: &[Value]) -> Result<Collection, String> {
                 })
                 .collect::<Result<Vec<_>, _>>()?;
             Ok(Collection::KdTree(ProtocolKdTree {
+                tree: KdTree::new(points.iter().cloned().zip(labels.iter().cloned())),
                 labels: labels.clone(),
                 points,
             }))
@@ -1750,6 +1770,7 @@ fn execute(request: Request, collections: &mut HashMap<String, Collection>) -> V
                         "multi-map",
                         "bi-map",
                         "heap",
+                        "fibonacci-heap",
                         "fixed-reverse-heap",
                         "hashed-array-tree",
                         "set-ops",

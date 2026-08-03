@@ -14,7 +14,7 @@ function createHeap(max, comparator) {
   this._comparator = comparator || defaultComparator;
   this._items = protocol ? null : (comparator ? [] : null);
   this._inner = protocol
-    ? protocol.create(comparator ? 'comparator-heap' : 'heap', [max])
+    ? protocol.create(comparator ? 'comparator-heap' : 'fibonacci-heap', [max])
     : (comparator ? null : new native.HeapInner(max));
 }
 
